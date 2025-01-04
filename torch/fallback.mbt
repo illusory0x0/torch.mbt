@@ -1,3 +1,4 @@
-fn tch_for_poc() -> Int {
-    0
+///|
+fn tch_for_poc() -> Bytes {
+  Bytes::new(0)
 }

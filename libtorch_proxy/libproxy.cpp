@@ -1,8 +1,10 @@
 #include <torch/torch.h>
 #include <iostream>
+#include <vector>
 
-int for_poc_internal() {
+std::vector<float> for_poc_internal() {
   torch::Tensor tensor = torch::rand({2, 3});
-  std::cout << tensor << std::endl;
-  return 0;
+  std::vector<float> vec(tensor.data_ptr<float>(),
+                         tensor.data_ptr<float>() + tensor.numel());
+  return vec;
 }
