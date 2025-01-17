@@ -1,8 +1,4 @@
 {
-    "targets": {
-        "torch_native.mbt": ["native"],
-        "fallback.mbt": ["not", "native"]
-    },
     "link": {
         "native": {
             "cc": "g++",

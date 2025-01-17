@@ -6,8 +6,6 @@
 
 std::vector<float> for_poc_internal();
 
-extern "C" struct moonbit_bytes *moonbit_make_bytes(int size, int value);
-
 struct moonbit_bytes* for_poc() {
   auto internal_result = for_poc_internal();
   auto size = internal_result.size() * sizeof(float);
