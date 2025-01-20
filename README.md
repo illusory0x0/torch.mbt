@@ -8,7 +8,7 @@ Will try to make it a library, but for [some reason](https://github.com/moonbitl
 
 It may not be as soon as expected.
 
-## Installation
+## Setup
 
 Currently, only Linux is supported.
 
@@ -17,22 +17,22 @@ Currently, only Linux is supported.
 - Edit `build.sh` to set the correct path of libtorch.
 - Run `bash build.sh`.
 
-This will eventually build the shared library `libtchproxy.so` and run a simple test (assert 6 random floats is in 0.0 ~ 1.0) by `moon test --target native`.
+This will eventually build the shared library `libtchproxy.so` and run tests.
 
-```
-bash build.sh
--- Configuring done
--- Generating done
--- Build files have been written to: /home/undef/moonbit/tch-mbt/libtorch_proxy/build
-Consolidate compiler generated dependencies of target tchproxy
-[100%] Built target tchproxy
-0.11847960948944092
-0.044190943241119385
-0.726997435092926
-0.8324601054191589
-0.1506635546684265
-0.02712196111679077
-Total tests: 1, passed: 1, failed: 0.
+## Usage
+
+You may change `torch/torch.mbt` and run `bash build.sh` to test.
+
+```moonbit
+test "tensor_add" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let tensor_b = tensor_from_array([6.0, 5.0, 4.0, 3.0, 2.0, 1.0])
+  let tensor_c = tensor_a + tensor_b
+  inspect!(tensor_c, content="Tensor([7, 7, 7, 7, 7, 7])")
+  tensor_a.drop()
+  tensor_b.drop()
+  tensor_c.drop()
+}
 ```
 
 ## How it works
@@ -55,11 +55,12 @@ However, libtorch not only needs C++ compiler support, but also requires a build
 
 > Potential optimization: We can hook g++ with a custom cc script, so we don't need a seperate shared library.
 
-## TODO
+## Roadmap & TODOs
 
+- [x] Basic tensor operations.
+- [ ] Basic neural network operations.
 - [ ] Build an real inference model demo.
 - [ ] Enhance build experience.
-- [ ] Support more APIs and make them public.
 
 ## License
 
