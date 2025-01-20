@@ -14,4 +14,7 @@ extern "C" fn at_tensor_of_data_ffi(
 extern "C" fn get_tensor_raw_ffi(tensor_id : Int) -> Bytes = "get_tensor_raw"
 
 ///|
+extern "C" fn drop_tensor_ffi(tensor_id : Int) = "drop_tensor"
+
+///|
 extern "C" fn add_tensors_ffi(tensor_id_a : Int, tensor_id_b : Int) -> Int = "add_tensors"

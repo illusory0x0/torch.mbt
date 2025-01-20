@@ -141,6 +141,11 @@ pub fn op_add[A](self : Tensor[A], other : Tensor[A]) -> Tensor[A] {
 }
 
 ///|
+pub fn drop[T](self : Tensor[T]) -> Unit {
+  drop_tensor_ffi(self.id)
+}
+
+///|
 impl[T : Element + Show] Show for Tensor[T] with output(self, logger) {
   logger.write_string("Tensor(")
   logger.write_string(T::to_vec(get_tensor_raw_ffi(self.id)).to_string())
