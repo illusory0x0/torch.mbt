@@ -1,25 +1,25 @@
 ///|
 enum ElementKind {
-  Uint8
-  Int8
+  // Uint8
+  // Int8
   Int16
   Int
   Int64
-  Half
+  // Half
   Float
   Double
-  ComplexHalf
-  ComplexFloat
-  ComplexDouble
-  Bool
-  QInt8
-  QUInt8
-  QInt32
-  BFloat16
-  Float8e5m2
-  Float8e4m3fn
-  Float8e5m2fnuz
-  Float8e4m3fnuz
+  // ComplexHalf
+  // ComplexFloat
+  // ComplexDouble
+  // Bool
+  // QInt8
+  // QUInt8
+  // QInt32
+  // BFloat16
+  // Float8e5m2
+  // Float8e4m3fn
+  // Float8e5m2fnuz
+  // Float8e4m3fnuz
 }
 
 ///|
@@ -34,26 +34,26 @@ trait Element {
 ///|
 impl Element with elt_size_in_bytes(self) {
   match self.kind() {
-    ElementKind::Uint8 => 1
-    ElementKind::Int8 => 1
+    // ElementKind::Uint8 => 1
+    // ElementKind::Int8 => 1
     ElementKind::Int16 => 2
     ElementKind::Int => 4
     ElementKind::Int64 => 8
-    ElementKind::Half => 2
+    // ElementKind::Half => 2
     ElementKind::Float => 4
     ElementKind::Double => 8
-    ElementKind::ComplexHalf => 4
-    ElementKind::ComplexFloat => 8
-    ElementKind::ComplexDouble => 16
-    ElementKind::Bool => 1
-    ElementKind::QInt8 => 1
-    ElementKind::QUInt8 => 1
-    ElementKind::QInt32 => 4
-    ElementKind::BFloat16 => 2
-    ElementKind::Float8e5m2 => 1
-    ElementKind::Float8e4m3fn => 1
-    ElementKind::Float8e5m2fnuz => 1
-    ElementKind::Float8e4m3fnuz => 1
+    // ElementKind::ComplexHalf => 4
+    // ElementKind::ComplexFloat => 8
+    // ElementKind::ComplexDouble => 16
+    // ElementKind::Bool => 1
+    // ElementKind::QInt8 => 1
+    // ElementKind::QUInt8 => 1
+    // ElementKind::QInt32 => 4
+    // ElementKind::BFloat16 => 2
+    // ElementKind::Float8e5m2 => 1
+    // ElementKind::Float8e4m3fn => 1
+    // ElementKind::Float8e5m2fnuz => 1
+    // ElementKind::Float8e4m3fnuz => 1
   }
 }
 
@@ -61,26 +61,26 @@ impl Element with elt_size_in_bytes(self) {
 ///|
 impl Element with c_int(self) {
   match self.kind() {
-    ElementKind::Uint8 => 0
-    ElementKind::Int8 => 1
+    // ElementKind::Uint8 => 0
+    // ElementKind::Int8 => 1
     ElementKind::Int16 => 2
     ElementKind::Int => 3
     ElementKind::Int64 => 4
-    ElementKind::Half => 5
+    // ElementKind::Half => 5
     ElementKind::Float => 6
     ElementKind::Double => 7
-    ElementKind::ComplexHalf => 8
-    ElementKind::ComplexFloat => 9
-    ElementKind::ComplexDouble => 10
-    ElementKind::Bool => 11
-    ElementKind::QInt8 => 12
-    ElementKind::QUInt8 => 13
-    ElementKind::QInt32 => 14
-    ElementKind::BFloat16 => 15
-    ElementKind::Float8e5m2 => 23
-    ElementKind::Float8e4m3fn => 24
-    ElementKind::Float8e5m2fnuz => 25
-    ElementKind::Float8e4m3fnuz => 26
+    // ElementKind::ComplexHalf => 8
+    // ElementKind::ComplexFloat => 9
+    // ElementKind::ComplexDouble => 10
+    // ElementKind::Bool => 11
+    // ElementKind::QInt8 => 12
+    // ElementKind::QUInt8 => 13
+    // ElementKind::QInt32 => 14
+    // ElementKind::BFloat16 => 15
+    // ElementKind::Float8e5m2 => 23
+    // ElementKind::Float8e4m3fn => 24
+    // ElementKind::Float8e5m2fnuz => 25
+    // ElementKind::Float8e4m3fnuz => 26
   }
 }
 

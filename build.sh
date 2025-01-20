@@ -1,3 +1,4 @@
+rm -rf target
 cd libtorch_proxy
 mkdir -p build
 cd build
