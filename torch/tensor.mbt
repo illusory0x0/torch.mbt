@@ -28,6 +28,7 @@ trait Element {
   elt_size_in_bytes(Self) -> UInt
   c_int(Self) -> Int
   bytes(Array[Self]) -> Bytes
+  to_vec(Bytes) -> Array[Self]
 }
 
 ///|
@@ -90,10 +91,16 @@ impl Element for Int16 with kind(_) { ElementKind::Int16 }
 impl Element for Int16 with bytes(arr) { int_16_array_to_bytes(arr) }
 
 ///|
+impl Element for Int16 with to_vec(bytes) { bytes_to_int_16_array(bytes) }
+
+///|
 impl Element for Int with kind(_) { ElementKind::Int }
 
 ///|
 impl Element for Int with bytes(arr) { int_array_to_bytes(arr) }
+
+///|
+impl Element for Int with to_vec(bytes) { bytes_to_int_array(bytes) }
 
 ///|
 impl Element for Int64 with kind(_) { ElementKind::Int64 }
@@ -102,10 +109,16 @@ impl Element for Int64 with kind(_) { ElementKind::Int64 }
 impl Element for Int64 with bytes(arr) { int_64_array_to_bytes(arr) }
 
 ///|
+impl Element for Int64 with to_vec(bytes) { bytes_to_int_64_array(bytes) }
+
+///|
 impl Element for Float with kind(_) { ElementKind::Float }
 
 ///|
 impl Element for Float with bytes(arr) { float_array_to_bytes(arr) }
+
+///|
+impl Element for Float with to_vec(bytes) { bytes_to_float_array(bytes) }
 
 ///|
 impl Element for Double with kind(_) { ElementKind::Double }
@@ -114,25 +127,28 @@ impl Element for Double with kind(_) { ElementKind::Double }
 impl Element for Double with bytes(arr) { double_array_to_bytes(arr) }
 
 ///|
-struct Tensor {
+impl Element for Double with to_vec(bytes) { bytes_to_double_array(bytes) }
+
+///|
+struct Tensor[T] {
   id : Int
 }
 
 ///|
-impl Show for Tensor with output(self, logger) {
+impl[T : Element + Show] Show for Tensor[T] with output(self, logger) {
   logger.write_string("Tensor(")
-  logger.write_string(self.id.to_string())
+  logger.write_string(T::to_vec(get_tensor_raw_ffi(self.id)).to_string())
   logger.write_string(")")
 }
 
 ///|
-fn at_tensor_of_data(
+fn at_tensor_of_data[T](
   data_ptr : Bytes,
   dims : Array[Int],
   ndims : UInt,
   element_size_in_bytes : UInt,
   _type : Int
-) -> Tensor {
+) -> Tensor[T] {
   let dims = int_array_to_bytes(dims)
   let id = at_tensor_of_data_ffi(
     data_ptr, dims, ndims, element_size_in_bytes, _type,
@@ -141,7 +157,7 @@ fn at_tensor_of_data(
 }
 
 ///|
-fn tensor_from_array[T : Element](arr : Array[T]) -> Tensor {
+fn tensor_from_array[T : Element](arr : Array[T]) -> Tensor[T] {
   let raw = T::bytes(arr)
   at_tensor_of_data(
     raw,
