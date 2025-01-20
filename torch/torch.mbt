@@ -16,4 +16,8 @@ test "demo" {
   tensor_b.drop()
   reshape_b.drop()
   tensor_c.drop()
+
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let tensor_b = -tensor_a
+  inspect!(tensor_b, content="Tensor([-1, -2, -3, -4, -5, -6])")
 }

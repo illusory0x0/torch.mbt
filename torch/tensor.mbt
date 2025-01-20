@@ -131,7 +131,7 @@ impl Element for Double with to_vec(bytes) { bytes_to_double_array(bytes) }
 
 ///|
 struct Tensor[T] {
-  id : Int
+  id : Int64
 }
 
 ///|
