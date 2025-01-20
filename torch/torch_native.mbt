@@ -18,3 +18,9 @@ extern "C" fn drop_tensor_ffi(tensor_id : Int) = "drop_tensor"
 
 ///|
 extern "C" fn add_tensors_ffi(tensor_id_a : Int, tensor_id_b : Int) -> Int = "add_tensors"
+
+///|
+extern "C" fn reshape_ffi(tensor_id : Int, dims : Bytes, ndims : UInt) -> Int = "reshape"
+
+///|
+extern "C" fn get_tensor_shape_ffi(tensor_id : Int) -> Bytes = "get_tensor_shape"

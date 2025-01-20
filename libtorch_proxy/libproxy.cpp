@@ -20,8 +20,16 @@ int at_tensor_of_data_internal(void *vs, int64_t *dims, size_t ndims,
         throw std::invalid_argument("incoherent element sizes in bytes");
     void *tensor_data = tensor.data_ptr();
     memcpy(tensor_data, vs, tensor.numel() * element_size_in_bytes);
-    global_tensor_map.insert(
-        std::pair<int, torch::Tensor>(global_tensor_map.size(), std::move(tensor)));
+    global_tensor_map.insert(std::pair<int, torch::Tensor>(
+        global_tensor_map.size(), std::move(tensor)));
+    return global_tensor_map.size() - 1;
+}
+
+int reshape_internal(int global_id, int64_t *dims, size_t ndims) {
+    torch::Tensor &tensor = global_tensor_map[global_id];
+    auto result = tensor.reshape(torch::IntArrayRef(dims, ndims));
+    global_tensor_map.insert(std::pair<int, torch::Tensor>(
+        global_tensor_map.size(), std::move(result)));
     return global_tensor_map.size() - 1;
 }
 
@@ -33,13 +41,19 @@ std::vector<unsigned char> get_tensor_raw_internal(int global_id) {
     return vec;
 }
 
+std::vector<unsigned> get_tensor_shape_internal(int global_id) {
+    torch::Tensor &tensor = global_tensor_map[global_id];
+    std::vector<unsigned> vec(tensor.sizes().begin(), tensor.sizes().end());
+    return vec;
+}
+
 void drop_tensor_internal(int global_id) { global_tensor_map.erase(global_id); }
 
 int add_tensors_internal(int global_id1, int global_id2) {
     torch::Tensor &tensor1 = global_tensor_map[global_id1];
     torch::Tensor &tensor2 = global_tensor_map[global_id2];
     torch::Tensor result = tensor1 + tensor2;
-    global_tensor_map.insert(
-        std::pair<int, torch::Tensor>(global_tensor_map.size(), result));
+    global_tensor_map.insert(std::pair<int, torch::Tensor>(
+        global_tensor_map.size(), std::move(result)));
     return global_tensor_map.size() - 1;
 }

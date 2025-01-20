@@ -135,6 +135,14 @@ struct Tensor[T] {
 }
 
 ///|
+pub fn reshape[T](self : Tensor[T], dims : Array[Int]) -> Tensor[T] {
+  let ndims = dims.length().reinterpret_as_uint()
+  let dims = dims.map(fn(x) { x.to_int64() }) |> int_64_array_to_bytes
+  let id = reshape_ffi(self.id, dims, ndims)
+  { id, }
+}
+
+///|
 pub fn op_add[A](self : Tensor[A], other : Tensor[A]) -> Tensor[A] {
   let id = add_tensors_ffi(self.id, other.id)
   { id, }
@@ -147,8 +155,43 @@ pub fn drop[T](self : Tensor[T]) -> Unit {
 
 ///|
 impl[T : Element + Show] Show for Tensor[T] with output(self, logger) {
+  let shape = (get_tensor_shape_ffi(self.id) |> bytes_to_int_array).rev()
+  let vec = T::to_vec(get_tensor_raw_ffi(self.id))
   logger.write_string("Tensor(")
-  logger.write_string(T::to_vec(get_tensor_raw_ffi(self.id)).to_string())
+  let n = vec.length()
+  let shape_len = shape.length()
+  for i in 0..<n {
+    let mut left_cnt = 0
+    let mut right_cnt = 0
+    let mut index = i
+    for j in 0..<shape_len {
+      let dim = shape[j]
+      let index_in_dim = index % dim
+      if index_in_dim == 0 {
+        left_cnt += 1
+      } else {
+        break
+      }
+      index = index / dim
+    }
+    index = i
+    for j in 0..<shape_len {
+      let dim = shape[j]
+      let index_in_dim = index % dim
+      if index_in_dim == dim - 1 {
+        right_cnt += 1
+      } else {
+        break
+      }
+      index = index / dim
+    }
+    logger.write_string("[".repeat(left_cnt))
+    logger.write_string(vec[i].to_string())
+    logger.write_string("]".repeat(right_cnt))
+    if i < n - 1 {
+      logger.write_string(", ")
+    }
+  }
   logger.write_string(")")
 }
 
@@ -160,7 +203,7 @@ fn at_tensor_of_data[T](
   element_size_in_bytes : UInt,
   _type : Int
 ) -> Tensor[T] {
-  let dims = int_array_to_bytes(dims)
+  let dims = dims.map(fn(x) { x.to_int64() }) |> int_64_array_to_bytes
   let id = at_tensor_of_data_ffi(
     data_ptr, dims, ndims, element_size_in_bytes, _type,
   )

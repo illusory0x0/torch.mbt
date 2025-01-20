@@ -24,3 +24,11 @@ test "tensor_add" {
   tensor_b.drop()
   tensor_c.drop()
 }
+
+test "reshape" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let tensor_b = tensor_a.reshape([2, 3])
+  inspect!(tensor_b, content="Tensor([[1, 2, 3], [4, 5, 6]])")
+  tensor_a.drop()
+  tensor_b.drop()
+}

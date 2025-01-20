@@ -48,3 +48,22 @@ int add_tensors_internal(int global_id1, int global_id2);
 int add_tensors(int global_id1, int global_id2) {
     return add_tensors_internal(global_id1, global_id2);
 }
+
+int reshape_internal(int global_id, int64_t *dims, size_t ndims);
+
+int reshape(int global_id, struct moonbit_bytes *dims, unsigned ndims) {
+    return reshape_internal(global_id, (int64_t *)dims->data, ndims);
+}
+
+std::vector<unsigned> get_tensor_shape_internal(int global_id);
+
+struct moonbit_bytes *get_tensor_shape(int global_id) {
+    auto internal_result = get_tensor_shape_internal(global_id);
+    auto size = internal_result.size() * sizeof(unsigned);
+    struct moonbit_bytes *bytes = moonbit_make_bytes(size, 0);
+    for (int i = 0; i < internal_result.size(); i++) {
+        memcpy(bytes->data + i * sizeof(unsigned), &internal_result[i],
+               sizeof(unsigned));
+    }
+    return bytes;
+}
