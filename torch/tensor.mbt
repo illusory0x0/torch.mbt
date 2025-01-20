@@ -135,6 +135,12 @@ struct Tensor[T] {
 }
 
 ///|
+pub fn op_add[A](self : Tensor[A], other : Tensor[A]) -> Tensor[A] {
+  let id = add_tensors_ffi(self.id, other.id)
+  { id, }
+}
+
+///|
 impl[T : Element + Show] Show for Tensor[T] with output(self, logger) {
   logger.write_string("Tensor(")
   logger.write_string(T::to_vec(get_tensor_raw_ffi(self.id)).to_string())

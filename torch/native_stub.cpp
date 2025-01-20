@@ -38,3 +38,9 @@ struct moonbit_bytes *get_tensor_raw(int global_id) {
     }
     return bytes;
 }
+
+int add_tensors_internal(int global_id1, int global_id2);
+
+int add_tensors(int global_id1, int global_id2) {
+    return add_tensors_internal(global_id1, global_id2);
+}

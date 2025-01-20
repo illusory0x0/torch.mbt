@@ -33,13 +33,13 @@ std::vector<unsigned char> get_tensor_raw_internal(int global_id) {
     return vec;
 }
 
-// void drop_tensor(int global_id) { global_tensor_map.erase(global_id); }
+void drop_tensor_internal(int global_id) { global_tensor_map.erase(global_id); }
 
-// int multiply_tensors(int global_id1, int global_id2) {
-//     torch::Tensor& tensor1 = global_tensor_map[global_id1];
-//     torch::Tensor& tensor2 = global_tensor_map[global_id2];
-//     torch::Tensor result = tensor1 * tensor2;
-//     global_tensor_map.insert(
-//         std::pair<int, torch::Tensor>(global_tensor_map.size(), result));
-//     return global_tensor_map.size() - 1;
-// }
+int add_tensors_internal(int global_id1, int global_id2) {
+    torch::Tensor &tensor1 = global_tensor_map[global_id1];
+    torch::Tensor &tensor2 = global_tensor_map[global_id2];
+    torch::Tensor result = tensor1 + tensor2;
+    global_tensor_map.insert(
+        std::pair<int, torch::Tensor>(global_tensor_map.size(), result));
+    return global_tensor_map.size() - 1;
+}
