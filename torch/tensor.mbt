@@ -149,6 +149,35 @@ pub fn op_add[A](self : Tensor[A], other : Tensor[A]) -> Tensor[A] {
 }
 
 ///|
+pub fn op_sub[A](self : Tensor[A], other : Tensor[A]) -> Tensor[A] {
+  let id = sub_tensors_ffi(self.id, other.id)
+  { id, }
+}
+
+///|
+pub fn op_neg[A](self : Tensor[A]) -> Tensor[A] {
+  let id = neg_tensor_ffi(self.id)
+  { id, }
+}
+
+///|
+pub fn op_equal[A](self : Tensor[A], other : Tensor[A]) -> Bool {
+  equal_tensors_ffi(self.id, other.id) == 1
+}
+
+///|
+pub fn op_mul[A](self : Tensor[A], other : Tensor[A]) -> Tensor[A] {
+  let id = mul_tensors_ffi(self.id, other.id)
+  { id, }
+}
+
+///|
+pub fn matmul[A](self : Tensor[A], other : Tensor[A]) -> Tensor[A] {
+  let id = matmul_tensors_ffi(self.id, other.id)
+  { id, }
+}
+
+///|
 pub fn drop[T](self : Tensor[T]) -> Unit {
   drop_tensor_ffi(self.id)
 }
@@ -220,4 +249,82 @@ fn tensor_from_array[T : Element](arr : Array[T]) -> Tensor[T] {
     arr[0].elt_size_in_bytes(),
     arr[0].c_int(),
   )
+}
+
+test "tensor" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  inspect!(tensor_a, content="Tensor([1, 2, 3, 4, 5, 6])")
+  let tensor_b = tensor_from_array([1, 2, 3])
+  inspect!(tensor_b, content="Tensor([1, 2, 3])")
+  tensor_a.drop()
+  tensor_b.drop()
+}
+
+test "tensor_add" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let tensor_b = tensor_from_array([6.0, 5.0, 4.0, 3.0, 2.0, 1.0])
+  let tensor_c = tensor_a + tensor_b
+  inspect!(tensor_c, content="Tensor([7, 7, 7, 7, 7, 7])")
+  tensor_a.drop()
+  tensor_b.drop()
+  tensor_c.drop()
+}
+
+test "tensor_neg" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let tensor_b = -tensor_a
+  inspect!(tensor_b, content="Tensor([-1, -2, -3, -4, -5, -6])")
+  tensor_a.drop()
+  tensor_b.drop()
+}
+
+test "tensor_sub" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let tensor_b = tensor_from_array([6.0, 5.0, 4.0, 3.0, 2.0, 1.0])
+  let tensor_c = tensor_a - tensor_b
+  inspect!(tensor_c, content="Tensor([-5, -3, -1, 1, 3, 5])")
+  tensor_a.drop()
+  tensor_b.drop()
+  tensor_c.drop()
+}
+
+test "tensor_mul" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let tensor_b = tensor_from_array([6.0, 5.0, 4.0, 3.0, 2.0, 1.0])
+  let tensor_c = tensor_a * tensor_b
+  inspect!(tensor_c, content="Tensor([6, 10, 12, 12, 10, 6])")
+  tensor_a.drop()
+  tensor_b.drop()
+  tensor_c.drop()
+}
+
+test "tensor_matmul" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let tensor_b = tensor_from_array([6.0, 5.0, 4.0, 3.0, 2.0, 1.0])
+  let reshape_b = tensor_b.reshape([6, 1])
+  let tensor_c = tensor_a.matmul(reshape_b)
+  inspect!(tensor_c, content="Tensor([56])")
+  tensor_a.drop()
+  tensor_b.drop()
+  reshape_b.drop()
+  tensor_c.drop()
+}
+
+test "tensor_allclose" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let tensor_b = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let tensor_c = tensor_from_array([6.0, 5.0, 4.0, 3.0, 2.0, 1.0])
+  assert_true!(tensor_a == tensor_b)
+  assert_false!(tensor_a == tensor_c)
+  tensor_a.drop()
+  tensor_b.drop()
+  tensor_c.drop()
+}
+
+test "reshape" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let tensor_b = tensor_a.reshape([2, 3])
+  inspect!(tensor_b, content="Tensor([[1, 2, 3], [4, 5, 6]])")
+  tensor_a.drop()
+  tensor_b.drop()
 }

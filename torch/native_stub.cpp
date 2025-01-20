@@ -41,13 +41,17 @@ struct moonbit_bytes *get_tensor_raw(int global_id) {
 
 void drop_tensor_internal(int global_id);
 
-void drop_tensor(int global_id) { drop_tensor_internal(global_id); }
-
 int add_tensors_internal(int global_id1, int global_id2);
 
-int add_tensors(int global_id1, int global_id2) {
-    return add_tensors_internal(global_id1, global_id2);
-}
+int neg_tensor_internal(int global_id);
+
+int sub_tensors_internal(int global_id1, int global_id2);
+
+int equal_tensors_internal(int global_id1, int global_id2);
+
+int mul_tensors_internal(int global_id1, int global_id2);
+
+int matmul_tensors_internal(int global_id1, int global_id2);
 
 int reshape_internal(int global_id, int64_t *dims, size_t ndims);
 

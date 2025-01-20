@@ -57,3 +57,44 @@ int add_tensors_internal(int global_id1, int global_id2) {
         global_tensor_map.size(), std::move(result)));
     return global_tensor_map.size() - 1;
 }
+
+int neg_tensor_internal(int global_id) {
+    torch::Tensor &tensor = global_tensor_map[global_id];
+    torch::Tensor result = -tensor;
+    global_tensor_map.insert(std::pair<int, torch::Tensor>(
+        global_tensor_map.size(), std::move(result)));
+    return global_tensor_map.size() - 1;
+}
+
+int sub_tensors_internal(int global_id1, int global_id2) {
+    torch::Tensor &tensor1 = global_tensor_map[global_id1];
+    torch::Tensor &tensor2 = global_tensor_map[global_id2];
+    torch::Tensor result = tensor1 - tensor2;
+    global_tensor_map.insert(std::pair<int, torch::Tensor>(
+        global_tensor_map.size(), std::move(result)));
+    return global_tensor_map.size() - 1;
+}
+
+int equal_tensors_internal(int global_id1, int global_id2) {
+    torch::Tensor &tensor1 = global_tensor_map[global_id1];
+    torch::Tensor &tensor2 = global_tensor_map[global_id2];
+    return torch::allclose(tensor1, tensor2);
+}
+
+int mul_tensors_internal(int global_id1, int global_id2) {
+    torch::Tensor &tensor1 = global_tensor_map[global_id1];
+    torch::Tensor &tensor2 = global_tensor_map[global_id2];
+    torch::Tensor result = tensor1 * tensor2;
+    global_tensor_map.insert(std::pair<int, torch::Tensor>(
+        global_tensor_map.size(), std::move(result)));
+    return global_tensor_map.size() - 1;
+}
+
+int matmul_tensors_internal(int global_id1, int global_id2) {
+    torch::Tensor &tensor1 = global_tensor_map[global_id1];
+    torch::Tensor &tensor2 = global_tensor_map[global_id2];
+    torch::Tensor result = torch::matmul(tensor1, tensor2);
+    global_tensor_map.insert(std::pair<int, torch::Tensor>(
+        global_tensor_map.size(), std::move(result)));
+    return global_tensor_map.size() - 1;
+}
