@@ -178,6 +178,12 @@ pub fn matmul[A](self : Tensor[A], other : Tensor[A]) -> Tensor[A] {
 }
 
 ///|
+pub fn transpose[T](self : Tensor[T]) -> Tensor[T] {
+  let id = transpose_tensor_ffi(self.id)
+  { id, }
+}
+
+///|
 pub fn drop[T](self : Tensor[T]) -> Unit {
   drop_tensor_ffi(self.id)
 }
@@ -308,6 +314,16 @@ test "tensor_matmul" {
   tensor_b.drop()
   reshape_b.drop()
   tensor_c.drop()
+}
+
+test "tensor_transpose" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let reshape_a = tensor_a.reshape([2, 3])
+  let tensor_b = reshape_a.transpose()
+  inspect!(tensor_b, content="Tensor([[1, 4], [2, 5], [3, 6]])")
+  tensor_a.drop()
+  reshape_a.drop()
+  tensor_b.drop()
 }
 
 test "tensor_allclose" {

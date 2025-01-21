@@ -50,6 +50,9 @@ extern "C" fn matmul_tensors_ffi(
 ) -> Int64 = "matmul_tensors_internal"
 
 ///|
+extern "C" fn transpose_tensor_ffi(tensor_id : Int64) -> Int64 = "transpose_tensor_internal"
+
+///|
 extern "C" fn reshape_ffi(
   tensor_id : Int64,
   dims : Bytes,

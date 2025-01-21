@@ -55,6 +55,8 @@ tensor_id mul_tensors_internal(tensor_id global_id1, tensor_id global_id2);
 
 tensor_id matmul_tensors_internal(tensor_id global_id1, tensor_id global_id2);
 
+tensor_id transpose_tensor_internal(tensor_id global_id);
+
 tensor_id reshape_internal(tensor_id global_id, int64_t *dims, size_t ndims);
 
 tensor_id reshape(tensor_id global_id, struct moonbit_bytes *dims,
