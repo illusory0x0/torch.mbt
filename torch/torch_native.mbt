@@ -1,7 +1,4 @@
 ///|
-extern "C" fn for_poc_ffi() -> Bytes = "for_poc"
-
-///|
 extern "C" fn at_tensor_of_data_ffi(
   data_ptr : Bytes,
   dims : Bytes,

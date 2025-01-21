@@ -6,16 +6,11 @@
 
 using tensor_id = int64_t;
 
-std::vector<float> for_poc_internal() {
-    torch::Tensor tensor = torch::rand({2, 3});
-    std::vector<float> vec(tensor.data_ptr<float>(),
-                           tensor.data_ptr<float>() + tensor.numel());
-    return vec;
-}
-
 std::atomic<tensor_id> next_id{0};
 
-int create_new_id() { return next_id.fetch_add(1, std::memory_order_relaxed); }
+tensor_id create_new_id() {
+    return next_id.fetch_add(1, std::memory_order_relaxed);
+}
 
 std::map<tensor_id, torch::Tensor> global_tensor_map;
 

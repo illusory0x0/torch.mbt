@@ -6,19 +6,6 @@
 
 using tensor_id = int64_t;
 
-std::vector<float> for_poc_internal();
-
-struct moonbit_bytes *for_poc() {
-    auto internal_result = for_poc_internal();
-    auto size = internal_result.size() * sizeof(float);
-    struct moonbit_bytes *bytes = moonbit_make_bytes(size, 0);
-    for (int i = 0; i < internal_result.size(); i++) {
-        memcpy(bytes->data + i * sizeof(float), &internal_result[i],
-               sizeof(float));
-    }
-    return bytes;
-}
-
 tensor_id at_tensor_of_data_internal(void *vs, int64_t *dims, size_t ndims,
                                      size_t element_size_in_bytes, int type);
 
