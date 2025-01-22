@@ -12,8 +12,12 @@ tensor_id at_tensor_of_data_internal(void *vs, int64_t *dims, size_t ndims,
 tensor_id at_tensor_of_data(struct moonbit_bytes *data_ptr,
                             struct moonbit_bytes *dims, unsigned ndims,
                             unsigned element_size_in_bytes, int type) {
-    return at_tensor_of_data_internal(data_ptr->data, (int64_t *)dims->data,
-                                      ndims, element_size_in_bytes, type);
+    tensor_id id =
+        at_tensor_of_data_internal(data_ptr->data, (int64_t *)dims->data, ndims,
+                                   element_size_in_bytes, type);
+    moonbit_decref(data_ptr);
+    moonbit_decref(dims);
+    return id;
 }
 
 std::vector<unsigned char> get_tensor_raw_internal(tensor_id global_id);
@@ -48,7 +52,9 @@ tensor_id reshape_internal(tensor_id global_id, int64_t *dims, size_t ndims);
 
 tensor_id reshape(tensor_id global_id, struct moonbit_bytes *dims,
                   unsigned ndims) {
-    return reshape_internal(global_id, (int64_t *)dims->data, ndims);
+    tensor_id id = reshape_internal(global_id, (int64_t *)dims->data, ndims);
+    moonbit_decref(dims);
+    return id;
 }
 
 std::vector<unsigned> get_tensor_shape_internal(tensor_id global_id);

@@ -66,7 +66,7 @@ struct moonbit_object {
 
 struct moonbit_object *moonbit_malloc(size_t size);
 void moonbit_incref(void *obj);
-void moonbit_decref(void *obj);
+extern "C" void moonbit_decref(void *obj);
 
 struct moonbit_string {
   struct moonbit_object header;
