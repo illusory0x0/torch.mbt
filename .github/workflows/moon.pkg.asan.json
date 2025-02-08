@@ -2,7 +2,7 @@
     "link": {
         "native": {
             "cc": "g++",
-            "cc-flags": "./torch/native_stub.cpp",
+            "cc-flags": "-fsanitize=address ./torch/native_stub.cpp",
             "cc-link-flags": "-L. -ltchproxy -lm"
         }
     }

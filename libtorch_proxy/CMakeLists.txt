@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 project(example-app)
 
+# use asan or not
+option(USE_ASAN "Enable AddressSanitizer" OFF)
+if(USE_ASAN)
+    message(STATUS "Enabling AddressSanitizer")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
+endif()
+
 # export compiler commands for clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(Torch REQUIRED)
