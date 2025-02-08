@@ -2,7 +2,6 @@
     "link": {
         "native": {
             "cc": "g++",
-            // "cc": "/home/undef/moonbit/tch-mbt/mycc", # simple script to print args and forward to g++
            "cc-flags": "./torch/native_stub.cpp",
            "cc-link-flags": "-L. -ltchproxy -lm"
         }

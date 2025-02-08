@@ -55,7 +55,7 @@ To support C++, there is another stuff to do: mark some functions in "moonbit.h"
 
 However, libtorch not only needs C++ compiler support, but also requires a build system like CMake. We offload the CMake build to a separate directory `libtorch_proxy` and then copy the shared library to the MoonBit project, which is the final FFI solution.
 
-> Potential optimization: We can hook g++ with a custom cc script, so we don't need a seperate shared library.
+> Potential optimization: We can hook g++ with a custom cc script, so we don't need a separate shared library.
 
 ## Roadmap & TODOs
 
