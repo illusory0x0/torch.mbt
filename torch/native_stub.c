@@ -9,22 +9,6 @@ tensor_id at_tensor_of_data_internal(void *vs, int64_t *dims, size_t ndims,
 
 int get_tensor_raw_internal(tensor_id global_id, unsigned char **data);
 
-void drop_tensor_internal(tensor_id global_id);
-
-tensor_id add_tensors_internal(tensor_id global_id1, tensor_id global_id2);
-
-tensor_id neg_tensor_internal(tensor_id global_id);
-
-tensor_id sub_tensors_internal(tensor_id global_id1, tensor_id global_id2);
-
-int equal_tensors_internal(tensor_id global_id1, tensor_id global_id2);
-
-tensor_id mul_tensors_internal(tensor_id global_id1, tensor_id global_id2);
-
-tensor_id matmul_tensors_internal(tensor_id global_id1, tensor_id global_id2);
-
-tensor_id transpose_tensor_internal(tensor_id global_id);
-
 tensor_id reshape_internal(tensor_id global_id, int64_t *dims, size_t ndims);
 
 int get_tensor_shape_internal(tensor_id global_id, unsigned **shape);
