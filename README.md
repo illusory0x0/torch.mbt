@@ -39,23 +39,19 @@ test "demo" {
 
 ## How it works
 
-First we need to make MoonBit work with C++. We replace the default `tcc` with `g++` to enable C++ support.
+For some compatibility issues, tch_mbt now uses gcc to compile the native backend of MoonBit. However, libtorch is a C++ library and requires a build system like CMake. To bridge the gap, tch_mbt builds a libtorch shared library and links it with the native backend.
 
 ```json
 "link": {
    "native": {
-      "cc": "g++",
-      "cc-flags": "./torch/native_stub.cpp",
-      "cc-link-flags": "-I . -L. -ltchproxy -lm"
+      "cc": "gcc",
+      "cc-flags": "./torch/native_stub.c",
+      "cc-link-flags": "-L. -ltchproxy -lm"
    }
 }
 ```
 
-To support C++, there is another stuff to do: mark some functions in "moonbit.h" as `extern "C"`. You can see it in "moonbit.hpp".
-
-However, libtorch not only needs C++ compiler support, but also requires a build system like CMake. We offload the CMake build to a separate directory `libtorch_proxy` and then copy the shared library to the MoonBit project, which is the final FFI solution.
-
-> Potential optimization: We can hook g++ with a custom cc script, so we don't need a separate shared library.
+`native_stub.c` is kept for interoperability, providing APIs where either the arguments or the return value is a MoonBit object.
 
 ## Roadmap & TODOs
 
