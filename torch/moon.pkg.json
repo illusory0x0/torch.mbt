@@ -1,8 +1,8 @@
 {
     "link": {
         "native": {
-            "cc": "g++",
-            "cc-flags": "./torch/native_stub.cpp",
+            "cc": "gcc",
+            "cc-flags": "./torch/native_stub.c",
             "cc-link-flags": "-L. -ltchproxy -lm"
         }
     }

@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <cstdlib>
 #include <iostream>
 #include <map>
 #include <torch/torch.h>
@@ -20,6 +21,7 @@ tensor_id insert_new_tensor(torch::Tensor tensor) {
     return new_id;
 }
 
+extern "C" {
 tensor_id at_tensor_of_data_internal(void *vs, int64_t *dims, size_t ndims,
                                      size_t element_size_in_bytes, int type) {
     torch::Tensor tensor =
@@ -37,20 +39,23 @@ tensor_id reshape_internal(tensor_id global_id, int64_t *dims, size_t ndims) {
     return insert_new_tensor(std::move(result));
 }
 
-std::vector<unsigned char> get_tensor_raw_internal(tensor_id global_id) {
+int get_tensor_raw_internal(tensor_id global_id, unsigned char **data) {
     torch::Tensor &tensor = global_tensor_map[global_id];
     torch::Tensor contiguous_tensor = tensor.contiguous();
     void *tensor_data = contiguous_tensor.data_ptr();
     std::vector<unsigned char> vec(contiguous_tensor.numel() *
                                    contiguous_tensor.element_size());
-    memcpy(vec.data(), tensor_data, vec.size());
-    return vec;
+    *data = (unsigned char *)malloc(vec.size());
+    memcpy(*data, tensor_data, vec.size());
+    return vec.size();
 }
 
-std::vector<unsigned> get_tensor_shape_internal(tensor_id global_id) {
+int get_tensor_shape_internal(tensor_id global_id, unsigned **shape) {
     torch::Tensor &tensor = global_tensor_map[global_id];
     std::vector<unsigned> vec(tensor.sizes().begin(), tensor.sizes().end());
-    return vec;
+    *shape = (unsigned *)malloc(vec.size() * sizeof(unsigned));
+    memcpy(*shape, vec.data(), vec.size() * sizeof(unsigned));
+    return vec.size();
 }
 
 void drop_tensor_internal(tensor_id global_id) {
@@ -101,4 +106,5 @@ tensor_id transpose_tensor_internal(tensor_id global_id) {
     torch::Tensor &tensor = global_tensor_map[global_id];
     torch::Tensor result = tensor.t();
     return insert_new_tensor(std::move(result));
+}
 }
