@@ -1,9 +1,11 @@
 {
     "link": {
         "native": {
-            "cc": "gcc",
-            "cc-flags": "-fsanitize=address ./torch/native_stub.c",
-            "cc-link-flags": "-L. -ltchproxy -lm"
+            "cc-flags": "-fsanitize=address -L. -ltchproxy"
         }
-    }
+    },
+    "native-stub": [
+        "native_stub.c"
+    ],
+    "warn-list": "-5"
 }
