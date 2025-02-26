@@ -1,10 +1,11 @@
 {
     "link": {
         "native": {
-            "cc-link-flags": "-L. -ltchproxy"
+            "cc-flags": "-L. -ltchproxy"
         }
     },
     "native-stub": [
         "native_stub.c"
-    ]
+    ],
+    "warn-list": "-5"
 }
