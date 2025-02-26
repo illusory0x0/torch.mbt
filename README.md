@@ -56,8 +56,10 @@ For some compatibility issues, tch_mbt now uses gcc to compile the native backen
 ## Roadmap & TODOs
 
 - [x] Basic tensor operations.
-- [ ] Basic neural network operations.
-- [ ] Build an real inference model demo.
+- [x] Basic neural network forward pass.
+- [x] Build an real inference model demo.
+- [ ] Add more tensor operations.
+- [ ] Add more neural network operations.
 - [ ] Enhance build experience.
 
 ## License

@@ -8,10 +8,13 @@ extern "C" fn at_tensor_of_data_ffi(
 ) -> Int64 = "at_tensor_of_data"
 
 ///|
+extern "C" fn load_tensor_from_file_ffi(path : Bytes) -> Int64 = "load_tensor_from_file"
+
+///|
 extern "C" fn get_tensor_raw_ffi(tensor_id : Int64) -> Bytes = "get_tensor_raw"
 
 ///|
-extern "C" fn drop_tensor_ffi(tensor_id : Int64) = "drop_tensor_internal"
+extern "C" fn drop_torch_object(tensor_id : Int64) = "drop_torch_object_internal"
 
 ///|
 extern "C" fn add_tensors_ffi(
@@ -58,3 +61,9 @@ extern "C" fn reshape_ffi(
 
 ///|
 extern "C" fn get_tensor_shape_ffi(tensor_id : Int64) -> Bytes = "get_tensor_shape"
+
+///|
+extern "C" fn load_model_ffi(path : Bytes) -> Int64 = "load_model"
+
+///|
+extern "C" fn forward_ffi(model_id : Int64, input_id : Int64) -> Int64 = "forward_internal"

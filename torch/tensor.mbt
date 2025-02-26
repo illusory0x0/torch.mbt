@@ -85,49 +85,79 @@ impl Element with c_int(self) {
 }
 
 ///|
-impl Element for Int16 with kind(_) { ElementKind::Int16 }
+impl Element for Int16 with kind(_) {
+  ElementKind::Int16
+}
 
 ///|
-impl Element for Int16 with bytes(arr) { int_16_array_to_bytes(arr) }
+impl Element for Int16 with bytes(arr) {
+  int_16_array_to_bytes(arr)
+}
 
 ///|
-impl Element for Int16 with to_vec(bytes) { bytes_to_int_16_array(bytes) }
+impl Element for Int16 with to_vec(bytes) {
+  bytes_to_int_16_array(bytes)
+}
 
 ///|
-impl Element for Int with kind(_) { ElementKind::Int }
+impl Element for Int with kind(_) {
+  ElementKind::Int
+}
 
 ///|
-impl Element for Int with bytes(arr) { int_array_to_bytes(arr) }
+impl Element for Int with bytes(arr) {
+  int_array_to_bytes(arr)
+}
 
 ///|
-impl Element for Int with to_vec(bytes) { bytes_to_int_array(bytes) }
+impl Element for Int with to_vec(bytes) {
+  bytes_to_int_array(bytes)
+}
 
 ///|
-impl Element for Int64 with kind(_) { ElementKind::Int64 }
+impl Element for Int64 with kind(_) {
+  ElementKind::Int64
+}
 
 ///|
-impl Element for Int64 with bytes(arr) { int_64_array_to_bytes(arr) }
+impl Element for Int64 with bytes(arr) {
+  int_64_array_to_bytes(arr)
+}
 
 ///|
-impl Element for Int64 with to_vec(bytes) { bytes_to_int_64_array(bytes) }
+impl Element for Int64 with to_vec(bytes) {
+  bytes_to_int_64_array(bytes)
+}
 
 ///|
-impl Element for Float with kind(_) { ElementKind::Float }
+impl Element for Float with kind(_) {
+  ElementKind::Float
+}
 
 ///|
-impl Element for Float with bytes(arr) { float_array_to_bytes(arr) }
+impl Element for Float with bytes(arr) {
+  float_array_to_bytes(arr)
+}
 
 ///|
-impl Element for Float with to_vec(bytes) { bytes_to_float_array(bytes) }
+impl Element for Float with to_vec(bytes) {
+  bytes_to_float_array(bytes)
+}
 
 ///|
-impl Element for Double with kind(_) { ElementKind::Double }
+impl Element for Double with kind(_) {
+  ElementKind::Double
+}
 
 ///|
-impl Element for Double with bytes(arr) { double_array_to_bytes(arr) }
+impl Element for Double with bytes(arr) {
+  double_array_to_bytes(arr)
+}
 
 ///|
-impl Element for Double with to_vec(bytes) { bytes_to_double_array(bytes) }
+impl Element for Double with to_vec(bytes) {
+  bytes_to_double_array(bytes)
+}
 
 ///|
 struct Tensor[T] {
@@ -185,7 +215,7 @@ pub fn transpose[T](self : Tensor[T]) -> Tensor[T] {
 
 ///|
 pub fn drop[T](self : Tensor[T]) -> Unit {
-  drop_tensor_ffi(self.id)
+  drop_torch_object(self.id)
 }
 
 ///|
@@ -257,6 +287,14 @@ fn tensor_from_array[T : Element](arr : Array[T]) -> Tensor[T] {
   )
 }
 
+///|
+fn tensor_from_file[T : Element](path : String) -> Tensor[T] {
+  let path = mbt_string_to_utf8_bytes(path, true)
+  let id = load_tensor_from_file_ffi(path)
+  { id, }
+}
+
+///|
 test "tensor" {
   let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
   inspect!(tensor_a, content="Tensor([1, 2, 3, 4, 5, 6])")
@@ -266,6 +304,7 @@ test "tensor" {
   tensor_b.drop()
 }
 
+///|
 test "tensor_add" {
   let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
   let tensor_b = tensor_from_array([6.0, 5.0, 4.0, 3.0, 2.0, 1.0])
@@ -276,6 +315,7 @@ test "tensor_add" {
   tensor_c.drop()
 }
 
+///|
 test "tensor_neg" {
   let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
   let tensor_b = -tensor_a
@@ -284,6 +324,7 @@ test "tensor_neg" {
   tensor_b.drop()
 }
 
+///|
 test "tensor_sub" {
   let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
   let tensor_b = tensor_from_array([6.0, 5.0, 4.0, 3.0, 2.0, 1.0])
@@ -294,6 +335,7 @@ test "tensor_sub" {
   tensor_c.drop()
 }
 
+///|
 test "tensor_mul" {
   let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
   let tensor_b = tensor_from_array([6.0, 5.0, 4.0, 3.0, 2.0, 1.0])
@@ -304,6 +346,7 @@ test "tensor_mul" {
   tensor_c.drop()
 }
 
+///|
 test "tensor_matmul" {
   let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
   let tensor_b = tensor_from_array([6.0, 5.0, 4.0, 3.0, 2.0, 1.0])
@@ -316,6 +359,7 @@ test "tensor_matmul" {
   tensor_c.drop()
 }
 
+///|
 test "tensor_transpose" {
   let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
   let reshape_a = tensor_a.reshape([2, 3])
@@ -326,6 +370,7 @@ test "tensor_transpose" {
   tensor_b.drop()
 }
 
+///|
 test "tensor_allclose" {
   let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
   let tensor_b = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
@@ -337,6 +382,7 @@ test "tensor_allclose" {
   tensor_c.drop()
 }
 
+///|
 test "reshape" {
   let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
   let tensor_b = tensor_a.reshape([2, 3])
