@@ -1,0 +1,39 @@
+package liuly0322/tch_mbt/torch
+
+// Values
+fn load_model_from_file(String) -> Model
+
+fn tensor_from_array[T : Element](Array[T]) -> Tensor[T]
+
+fn tensor_from_file[T : Element](String) -> Tensor[T]
+
+// Types and methods
+pub struct Model {
+  id : Int64
+}
+impl Model {
+  drop(Self) -> Unit
+  forward[U, V](Self, Tensor[U]) -> Tensor[V]
+}
+
+pub struct Tensor[T] {
+  id : Int64
+}
+impl Tensor {
+  drop[T](Self[T]) -> Unit
+  get_raw_data[T : Element](Self[T]) -> Array[T]
+  matmul[A](Self[A], Self[A]) -> Self[A]
+  op_add[A](Self[A], Self[A]) -> Self[A]
+  op_equal[A](Self[A], Self[A]) -> Bool
+  op_mul[A](Self[A], Self[A]) -> Self[A]
+  op_neg[A](Self[A]) -> Self[A]
+  op_sub[A](Self[A], Self[A]) -> Self[A]
+  reshape[T](Self[T], Array[Int]) -> Self[T]
+  transpose[T](Self[T]) -> Self[T]
+}
+
+// Type aliases
+
+// Traits
+trait Element
+

@@ -1,10 +1,10 @@
 ///|
-struct Model {
+pub struct Model {
   id : Int64
 }
 
 ///|
-pub fn load_model(path : String) -> Model {
+pub fn load_model_from_file(path : String) -> Model {
   let path = mbt_string_to_utf8_bytes(path, true)
   let id = load_model_ffi(path)
   { id, }

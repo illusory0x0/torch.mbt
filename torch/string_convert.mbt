@@ -15,7 +15,7 @@
 // limitations under the License.
 
 ///|
-pub fn mbt_string_to_utf8_bytes(str : String, is_filename : Bool) -> Bytes {
+fn mbt_string_to_utf8_bytes(str : String, is_filename : Bool) -> Bytes {
   let res : Array[Byte] = []
   let len = str.length()
   let mut i = 0
@@ -50,47 +50,4 @@ pub fn mbt_string_to_utf8_bytes(str : String, is_filename : Bool) -> Bytes {
     res.push((0).to_byte())
   }
   Bytes::from_array(res)
-}
-
-///|
-pub fn utf8_bytes_to_mbt_string(bytes : Bytes) -> String {
-  let res : Array[Char] = []
-  let len = bytes.length()
-  let mut i = 0
-  while i < len {
-    let mut c = bytes[i].to_int()
-    if c < 0x80 {
-      res.push(Char::from_int(c))
-      i += 1
-    } else if c < 0xE0 {
-      if i + 1 >= len {
-        break
-      }
-      c = ((c & 0x1F) << 6) | (bytes[i + 1].to_int() & 0x3F)
-      res.push(Char::from_int(c))
-      i += 2
-    } else if c < 0xF0 {
-      if i + 2 >= len {
-        break
-      }
-      c = ((c & 0x0F) << 12) |
-        ((bytes[i + 1].to_int() & 0x3F) << 6) |
-        (bytes[i + 2].to_int() & 0x3F)
-      res.push(Char::from_int(c))
-      i += 3
-    } else {
-      if i + 3 >= len {
-        break
-      }
-      c = ((c & 0x07) << 18) |
-        ((bytes[i + 1].to_int() & 0x3F) << 12) |
-        ((bytes[i + 2].to_int() & 0x3F) << 6) |
-        (bytes[i + 3].to_int() & 0x3F)
-      c -= 0x10000
-      res.push(Char::from_int((c >> 10) + 0xD800))
-      res.push(Char::from_int((c & 0x3FF) + 0xDC00))
-      i += 4
-    }
-  }
-  String::from_array(res)
 }

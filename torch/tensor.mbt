@@ -1,5 +1,5 @@
 ///|
-enum ElementKind {
+priv enum ElementKind {
   // Uint8
   // Int8
   Int16
@@ -160,8 +160,13 @@ impl Element for Double with to_vec(bytes) {
 }
 
 ///|
-struct Tensor[T] {
+pub struct Tensor[T] {
   id : Int64
+}
+
+///|
+pub fn get_raw_data[T : Element](self : Tensor[T]) -> Array[T] {
+  T::to_vec(get_tensor_raw_ffi(self.id))
 }
 
 ///|
@@ -221,7 +226,7 @@ pub fn drop[T](self : Tensor[T]) -> Unit {
 ///|
 impl[T : Element + Show] Show for Tensor[T] with output(self, logger) {
   let shape = (get_tensor_shape_ffi(self.id) |> bytes_to_int_array).rev()
-  let vec = T::to_vec(get_tensor_raw_ffi(self.id))
+  let vec = self.get_raw_data()
   logger.write_string("Tensor(")
   let n = vec.length()
   let shape_len = shape.length()
@@ -276,7 +281,7 @@ fn at_tensor_of_data[T](
 }
 
 ///|
-fn tensor_from_array[T : Element](arr : Array[T]) -> Tensor[T] {
+pub fn tensor_from_array[T : Element](arr : Array[T]) -> Tensor[T] {
   let raw = T::bytes(arr)
   at_tensor_of_data(
     raw,
@@ -288,7 +293,7 @@ fn tensor_from_array[T : Element](arr : Array[T]) -> Tensor[T] {
 }
 
 ///|
-fn tensor_from_file[T : Element](path : String) -> Tensor[T] {
+pub fn tensor_from_file[T : Element](path : String) -> Tensor[T] {
   let path = mbt_string_to_utf8_bytes(path, true)
   let id = load_tensor_from_file_ffi(path)
   { id, }
