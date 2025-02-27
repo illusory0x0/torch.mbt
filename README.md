@@ -28,21 +28,18 @@ test "inference" {
   let model = load_model_from_file("python_examples/mnist/mnist_cnn.pt")
   let cases = ["1", "2", "3", "4", "5"]
   let expected_answers = [7, 2, 1, 0, 4]
-  fn argmax(v : Array[Float]) -> Int {
-    v.foldi(init=0, fn(i, acc, x) { if x > v[acc] { i } else { acc } })
-  }
-
   for i in 0..<5 {
     let filename = "python_examples/mnist/samples/mnist_" + cases[i] + ".pt"
     let input : Tensor[Float] = tensor_from_file(filename)
     let input_resized = input.reshape([1, 1, 28, 28])
     let output : Tensor[Float] = model.forward(input_resized)
-    let output_vec = output.get_raw_data()
-    let index_max = argmax(output_vec)
-    assert_eq!(index_max, expected_answers[i])
+    let output_argmax = output.argmax()
+    let index_max = output_argmax.get_raw_data()[0]
+    assert_eq!(index_max, expected_answers[i].to_int64())
     input.drop()
     input_resized.drop()
     output.drop()
+    output_argmax.drop()
   }
   model.drop()
 }

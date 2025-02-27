@@ -14,6 +14,9 @@ extern "C" fn load_tensor_from_file_ffi(path : Bytes) -> Int64 = "load_tensor_fr
 extern "C" fn get_tensor_raw_ffi(tensor_id : Int64) -> Bytes = "get_tensor_raw"
 
 ///|
+extern "C" fn argmax_tensor_ffi(tensor_id : Int64) -> Int64 = "argmax_tensor_internal"
+
+///|
 extern "C" fn drop_torch_object(tensor_id : Int64) = "drop_torch_object_internal"
 
 ///|

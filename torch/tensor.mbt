@@ -219,6 +219,12 @@ pub fn transpose[T](self : Tensor[T]) -> Tensor[T] {
 }
 
 ///|
+pub fn argmax[T](self : Tensor[T]) -> Tensor[Int64] {
+  let id = argmax_tensor_ffi(self.id)
+  { id, }
+}
+
+///|
 pub fn drop[T](self : Tensor[T]) -> Unit {
   drop_torch_object(self.id)
 }
