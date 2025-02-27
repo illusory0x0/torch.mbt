@@ -154,6 +154,12 @@ torch_object_id transpose_tensor_internal(torch_object_id global_id) {
     return insert_new_torch_object(std::move(result));
 }
 
+torch_object_id argmin_tensor_internal(torch_object_id global_id) {
+    auto &tensor = std::any_cast<torch::Tensor &>(global_torch_map[global_id]);
+    torch::Tensor result = torch::argmin(tensor);
+    return insert_new_torch_object(std::move(result));
+}
+
 torch_object_id argmax_tensor_internal(torch_object_id global_id) {
     auto &tensor = std::any_cast<torch::Tensor &>(global_torch_map[global_id]);
     torch::Tensor result = torch::argmax(tensor);

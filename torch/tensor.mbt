@@ -219,6 +219,17 @@ pub fn transpose[T](self : Tensor[T]) -> Tensor[T] {
 }
 
 ///|
+pub fn shape[T](self : Tensor[T]) -> Array[Int] {
+  get_tensor_shape_ffi(self.id) |> bytes_to_int_array
+}
+
+///|
+pub fn argmin[T](self : Tensor[T]) -> Tensor[Int64] {
+  let id = argmin_tensor_ffi(self.id)
+  { id, }
+}
+
+///|
 pub fn argmax[T](self : Tensor[T]) -> Tensor[Int64] {
   let id = argmax_tensor_ffi(self.id)
   { id, }
@@ -231,7 +242,7 @@ pub fn drop[T](self : Tensor[T]) -> Unit {
 
 ///|
 impl[T : Element + Show] Show for Tensor[T] with output(self, logger) {
-  let shape = (get_tensor_shape_ffi(self.id) |> bytes_to_int_array).rev()
+  let shape = self.shape().rev()
   let vec = self.get_raw_data()
   logger.write_string("Tensor(")
   let n = vec.length()
@@ -378,6 +389,32 @@ test "tensor_transpose" {
   inspect!(tensor_b, content="Tensor([[1, 4], [2, 5], [3, 6]])")
   tensor_a.drop()
   reshape_a.drop()
+  tensor_b.drop()
+}
+
+///|
+test "tensor_shape" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let shape = tensor_a.shape()
+  inspect!(shape, content="[6]")
+  tensor_a.drop()
+}
+
+///|
+test "tensor_argmin" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let tensor_b = tensor_a.argmin()
+  inspect!(tensor_b, content="Tensor(0)")
+  tensor_a.drop()
+  tensor_b.drop()
+}
+
+///|
+test "tensor_argmax" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let tensor_b = tensor_a.argmax()
+  inspect!(tensor_b, content="Tensor(5)")
+  tensor_a.drop()
   tensor_b.drop()
 }
 

@@ -21,6 +21,7 @@ pub struct Tensor[T] {
 }
 impl Tensor {
   argmax[T](Self[T]) -> Self[Int64]
+  argmin[T](Self[T]) -> Self[Int64]
   drop[T](Self[T]) -> Unit
   get_raw_data[T : Element](Self[T]) -> Array[T]
   matmul[A](Self[A], Self[A]) -> Self[A]
@@ -30,6 +31,7 @@ impl Tensor {
   op_neg[A](Self[A]) -> Self[A]
   op_sub[A](Self[A], Self[A]) -> Self[A]
   reshape[T](Self[T], Array[Int]) -> Self[T]
+  shape[T](Self[T]) -> Array[Int]
   transpose[T](Self[T]) -> Self[T]
 }
 
