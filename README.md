@@ -1,29 +1,29 @@
 # tch_mbt
 
-A PoC of using libtorch in MoonBit.
+Using libtorch in MoonBit.
 
-Will try to make it a library, but for [some reason](https://github.com/moonbitlang/x/issues/70#issuecomment-2469536770):
-
-> ... is not ready for external usage for now due to some native link flag issue.
-
-It may not be as soon as expected.
+For [some native link reason](https://github.com/moonbitlang/x/issues/70#issuecomment-2469536770), it's now a starter template instead of a library.
 
 ## Setup
 
-Currently, only Linux is supported.
+Only Linux is supported.
 
-- Clone this repo.
-- Install libtorch (<https://pytorch.org/cppdocs/installing.html>) and CMake (and possibly `build-essential`).
+- Clone the repo.
+- Install libtorch (<https://pytorch.org/cppdocs/installing.html>).
+- Install CMake (and possibly "build-essential").
 - Edit `build.sh` to set the correct path of libtorch.
 - Run `bash build.sh`.
 
-This will eventually build the shared library `libtchproxy.so` and run tests.
+You are expected to see the unittests passed.
 
 ## Usage
 
-You may change `torch/torch.mbt` and run `bash build.sh` to test.
+Change code in `torch/torch.mbt` and run `bash build.sh` to test.
 
 ```moonbit
+// torch/torch.mbt
+// Load a model and do inference on MNIST dataset.
+// You can check the images in python_examples/mnist/samples.
 test "inference" {
   let model = load_model_from_file("python_examples/mnist/mnist_cnn.pt")
   let cases = ["1", "2", "3", "4", "5"]
@@ -47,23 +47,26 @@ test "inference" {
 
 ## API
 
-You can check the full list in [torch.mbti](torch/torch.mbti).
+Check the full list in [torch.mbti](torch/torch.mbti).
 
 ## How it works
 
-For some compatibility issues, tch_mbt now uses gcc to compile the native backend of MoonBit. However, libtorch is a C++ library and requires a build system like CMake. To bridge the gap, tch_mbt builds a libtorch shared library and links it with the native backend.
+tch_mbt uses the default cc to compile the native backend of MoonBit. However, libtorch is a C++ library and requires a build system like CMake. To bridge the gap, tch_mbt will first build a shared "C" library "tchproxy".
 
 ```json
-"link": {
-   "native": {
-      "cc": "gcc",
-      "cc-flags": "./torch/native_stub.c",
-      "cc-link-flags": "-L. -ltchproxy -lm"
-   }
+{
+    "link": {
+        "native": {
+            "cc-flags": "-L. -ltchproxy"
+        }
+    },
+    "native-stub": [
+        "native_stub.c"
+    ]
 }
 ```
 
-`native_stub.c` is kept for interoperability, providing APIs where either the arguments or the return value is a MoonBit object.
+`native_stub.c` is here for interoperability, wrapping FFIs that either the arguments or the return value is a MoonBit object.
 
 ## Roadmap & TODOs
 
