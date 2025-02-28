@@ -76,11 +76,10 @@ int get_tensor_raw_internal(torch_object_id global_id, unsigned char **data) {
     auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
     torch::Tensor contiguous_tensor = tensor.contiguous();
     void *tensor_data = contiguous_tensor.data_ptr();
-    std::vector<unsigned char> vec(contiguous_tensor.numel() *
-                                   contiguous_tensor.element_size());
-    *data = (unsigned char *)malloc(vec.size());
-    memcpy(*data, tensor_data, vec.size());
-    return vec.size();
+    auto size = contiguous_tensor.numel() * contiguous_tensor.element_size();
+    *data = (unsigned char *)malloc(size);
+    memcpy(*data, tensor_data, size);
+    return size;
 }
 
 int get_tensor_shape_internal(torch_object_id global_id, unsigned **shape) {
