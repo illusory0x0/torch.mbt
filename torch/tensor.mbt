@@ -219,6 +219,11 @@ pub fn transpose[T](self : Tensor[T]) -> Tensor[T] {
 }
 
 ///|
+pub fn length[T](self : Tensor[T]) -> Int {
+  get_tensor_length_ffi(self.id)
+}
+
+///|
 pub fn shape[T](self : Tensor[T]) -> Array[Int] {
   get_tensor_shape_ffi(self.id) |> bytes_to_int_array
 }
@@ -389,6 +394,20 @@ test "tensor_transpose" {
   inspect!(tensor_b, content="Tensor([[1, 4], [2, 5], [3, 6]])")
   tensor_a.drop()
   reshape_a.drop()
+  tensor_b.drop()
+}
+
+///|
+test "tensor_length" {
+  let tensor_a = tensor_from_array([1.0])
+  let length = tensor_a.length()
+  inspect!(length, content="1")
+  inspect!(tensor_a, content="Tensor([1])")
+  let tensor_b = tensor_a.reshape([])
+  let length = tensor_b.length()
+  inspect!(length, content="1")
+  inspect!(tensor_b, content="Tensor(1)")
+  tensor_a.drop()
   tensor_b.drop()
 }
 

@@ -66,6 +66,9 @@ extern "C" fn reshape_ffi(
 ) -> Int64 = "reshape"
 
 ///|
+extern "C" fn get_tensor_length_ffi(tensor_id : Int64) -> Int = "get_tensor_length_internal"
+
+///|
 extern "C" fn get_tensor_shape_ffi(tensor_id : Int64) -> Bytes = "get_tensor_shape"
 
 ///|

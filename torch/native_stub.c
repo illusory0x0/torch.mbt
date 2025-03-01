@@ -9,10 +9,15 @@ torch_object_id at_tensor_of_data_internal(void *vs, int64_t *dims,
                                            size_t element_size_in_bytes,
                                            int type);
 
-int get_tensor_raw_internal(torch_object_id global_id, unsigned char **data);
+void get_tensor_raw_internal(torch_object_id global_id, unsigned char *data,
+                             int n);
 
 torch_object_id reshape_internal(torch_object_id global_id, int64_t *dims,
                                  size_t ndims);
+
+int get_tensor_length_internal(torch_object_id global_id);
+
+int get_tensor_element_size_internal(torch_object_id global_id);
 
 int get_tensor_shape_internal(torch_object_id global_id, unsigned **shape);
 
@@ -31,11 +36,10 @@ torch_object_id at_tensor_of_data(moonbit_bytes_t data_ptr,
 }
 
 moonbit_bytes_t get_tensor_raw(torch_object_id global_id) {
-    unsigned char *data;
-    int size = get_tensor_raw_internal(global_id, &data);
-    moonbit_bytes_t bytes = moonbit_make_bytes(size, 0);
-    memcpy(bytes, data, size);
-    free(data);
+    int expected_size = get_tensor_length_internal(global_id) *
+                        get_tensor_element_size_internal(global_id);
+    moonbit_bytes_t bytes = moonbit_make_bytes(expected_size, 0);
+    get_tensor_raw_internal(global_id, bytes, expected_size);
     return bytes;
 }
 

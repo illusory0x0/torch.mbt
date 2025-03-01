@@ -72,14 +72,26 @@ torch_object_id reshape_internal(torch_object_id global_id, int64_t *dims,
     return insert_new_torch_object(std::move(result));
 }
 
-int get_tensor_raw_internal(torch_object_id global_id, unsigned char **data) {
+void get_tensor_raw_internal(torch_object_id global_id, unsigned char *data,
+                             int n) {
     auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
     torch::Tensor contiguous_tensor = tensor.contiguous();
     void *tensor_data = contiguous_tensor.data_ptr();
     auto size = contiguous_tensor.numel() * contiguous_tensor.element_size();
-    *data = (unsigned char *)malloc(size);
-    memcpy(*data, tensor_data, size);
-    return size;
+    if (n != size) {
+        throw std::invalid_argument("incoherent size");
+    }
+    memcpy(data, tensor_data, size);
+}
+
+int get_tensor_length_internal(torch_object_id global_id) {
+    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
+    return tensor.numel();
+}
+
+int get_tensor_element_size_internal(torch_object_id global_id) {
+    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
+    return tensor.element_size();
 }
 
 int get_tensor_shape_internal(torch_object_id global_id, unsigned **shape) {
