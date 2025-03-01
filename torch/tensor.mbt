@@ -178,6 +178,24 @@ pub fn reshape[T](self : Tensor[T], dims : Array[Int]) -> Tensor[T] {
 }
 
 ///|
+pub fn abs[T](self : Tensor[T]) -> Tensor[T] {
+  let id = abs_tensor_ffi(self.id)
+  { id, }
+}
+
+///|
+pub fn exp[T, U](self : Tensor[T]) -> Tensor[U] {
+  let id = exp_tensor_ffi(self.id)
+  { id, }
+}
+
+///|
+pub fn log[T, U](self : Tensor[T]) -> Tensor[U] {
+  let id = log_tensor_ffi(self.id)
+  { id, }
+}
+
+///|
 pub fn op_add[A](self : Tensor[A], other : Tensor[A]) -> Tensor[A] {
   let id = add_tensors_ffi(self.id, other.id)
   { id, }
@@ -327,6 +345,39 @@ test "tensor" {
   inspect!(tensor_a, content="Tensor([1, 2, 3, 4, 5, 6])")
   let tensor_b = tensor_from_array([1, 2, 3])
   inspect!(tensor_b, content="Tensor([1, 2, 3])")
+  tensor_a.drop()
+  tensor_b.drop()
+}
+
+///|
+test "tensor_abs" {
+  let tensor_a = tensor_from_array([-1.0, -2.0, -3.0, -4.0, -5.0, -6.0])
+  let tensor_b = tensor_a.abs()
+  inspect!(tensor_b, content="Tensor([1, 2, 3, 4, 5, 6])")
+  tensor_a.drop()
+  tensor_b.drop()
+}
+
+///|
+test "tensor_exp" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let tensor_b : Tensor[Double] = tensor_a.exp()
+  inspect!(
+    tensor_b,
+    content="Tensor([2.718281828459045, 7.38905609893065, 20.085536923187668, 54.598150033144236, 148.4131591025766, 403.4287934927351])",
+  )
+  tensor_a.drop()
+  tensor_b.drop()
+}
+
+///|
+test "tensor_log" {
+  let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+  let tensor_b : Tensor[Double] = tensor_a.log()
+  inspect!(
+    tensor_b,
+    content="Tensor([0, 0.6931471805599453, 1.0986122886681098, 1.3862943611198906, 1.6094379124341003, 1.791759469228055])",
+  )
   tensor_a.drop()
   tensor_b.drop()
 }

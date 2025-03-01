@@ -20,11 +20,14 @@ pub struct Tensor[T] {
   id : Int64
 }
 impl Tensor {
+  abs[T](Self[T]) -> Self[T]
   argmax[T](Self[T]) -> Self[Int64]
   argmin[T](Self[T]) -> Self[Int64]
   drop[T](Self[T]) -> Unit
+  exp[T, U](Self[T]) -> Self[U]
   get_raw_data[T : Element](Self[T]) -> Array[T]
   length[T](Self[T]) -> Int
+  log[T, U](Self[T]) -> Self[U]
   matmul[A](Self[A], Self[A]) -> Self[A]
   op_add[A](Self[A], Self[A]) -> Self[A]
   op_equal[A](Self[A], Self[A]) -> Bool

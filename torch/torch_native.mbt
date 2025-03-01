@@ -23,6 +23,15 @@ extern "C" fn argmax_tensor_ffi(tensor_id : Int64) -> Int64 = "argmax_tensor_int
 extern "C" fn drop_torch_object(tensor_id : Int64) = "drop_torch_object_internal"
 
 ///|
+extern "C" fn abs_tensor_ffi(tensor_id : Int64) -> Int64 = "abs_tensor_internal"
+
+///|
+extern "C" fn exp_tensor_ffi(tensor_id : Int64) -> Int64 = "exp_tensor_internal"
+
+///|
+extern "C" fn log_tensor_ffi(tensor_id : Int64) -> Int64 = "log_tensor_internal"
+
+///|
 extern "C" fn add_tensors_ffi(
   tensor_id_a : Int64,
   tensor_id_b : Int64

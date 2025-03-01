@@ -106,6 +106,24 @@ void drop_torch_object_internal(torch_object_id global_id) {
     global_torch_map.erase(global_id);
 }
 
+torch_object_id abs_tensor_internal(torch_object_id global_id) {
+    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
+    torch::Tensor result = torch::abs(tensor);
+    return insert_new_torch_object(std::move(result));
+}
+
+torch_object_id exp_tensor_internal(torch_object_id global_id) {
+    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
+    torch::Tensor result = torch::exp(tensor);
+    return insert_new_torch_object(std::move(result));
+}
+
+torch_object_id log_tensor_internal(torch_object_id global_id) {
+    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
+    torch::Tensor result = torch::log(tensor);
+    return insert_new_torch_object(std::move(result));
+}
+
 torch_object_id add_tensors_internal(torch_object_id global_id1,
                                      torch_object_id global_id2) {
     auto &tensor1 = std::get<torch::Tensor>(global_torch_map[global_id1]);
