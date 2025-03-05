@@ -28,16 +28,17 @@ impl Tensor {
   get_raw_data[T : Element](Self[T]) -> Array[T]
   length[T](Self[T]) -> Int
   log[T, U](Self[T]) -> Self[U]
-  matmul[A](Self[A], Self[A]) -> Self[A]
-  op_add[A](Self[A], Self[A]) -> Self[A]
-  op_equal[A](Self[A], Self[A]) -> Bool
-  op_mul[A](Self[A], Self[A]) -> Self[A]
-  op_neg[A](Self[A]) -> Self[A]
-  op_sub[A](Self[A], Self[A]) -> Self[A]
+  matmul[T](Self[T], Self[T]) -> Self[T]
+  op_add[T](Self[T], Self[T]) -> Self[T]
+  op_mul[T](Self[T], Self[T]) -> Self[T]
+  op_neg[T](Self[T]) -> Self[T]
+  op_sub[T](Self[T], Self[T]) -> Self[T]
   reshape[T](Self[T], Array[Int]) -> Self[T]
   shape[T](Self[T]) -> Array[Int]
   transpose[T](Self[T]) -> Self[T]
 }
+impl[T] Eq for Tensor[T]
+impl[T : Element + Show] Show for Tensor[T]
 
 // Type aliases
 

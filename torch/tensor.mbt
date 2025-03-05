@@ -196,36 +196,36 @@ pub fn log[T, U](self : Tensor[T]) -> Tensor[U] {
 }
 
 ///|
-pub fn op_add[A](self : Tensor[A], other : Tensor[A]) -> Tensor[A] {
+pub fn op_add[T](self : Tensor[T], other : Tensor[T]) -> Tensor[T] {
   let id = add_tensors_ffi(self.id, other.id)
   { id, }
 }
 
 ///|
-pub fn op_sub[A](self : Tensor[A], other : Tensor[A]) -> Tensor[A] {
+pub fn op_sub[T](self : Tensor[T], other : Tensor[T]) -> Tensor[T] {
   let id = sub_tensors_ffi(self.id, other.id)
   { id, }
 }
 
 ///|
-pub fn op_neg[A](self : Tensor[A]) -> Tensor[A] {
+pub fn op_neg[T](self : Tensor[T]) -> Tensor[T] {
   let id = neg_tensor_ffi(self.id)
   { id, }
 }
 
 ///|
-pub fn op_equal[A](self : Tensor[A], other : Tensor[A]) -> Bool {
+pub impl[T] Eq for Tensor[T] with op_equal(self : Tensor[T], other : Tensor[T]) {
   equal_tensors_ffi(self.id, other.id) == 1
 }
 
 ///|
-pub fn op_mul[A](self : Tensor[A], other : Tensor[A]) -> Tensor[A] {
+pub fn op_mul[T](self : Tensor[T], other : Tensor[T]) -> Tensor[T] {
   let id = mul_tensors_ffi(self.id, other.id)
   { id, }
 }
 
 ///|
-pub fn matmul[A](self : Tensor[A], other : Tensor[A]) -> Tensor[A] {
+pub fn matmul[T](self : Tensor[T], other : Tensor[T]) -> Tensor[T] {
   let id = matmul_tensors_ffi(self.id, other.id)
   { id, }
 }
@@ -264,7 +264,7 @@ pub fn drop[T](self : Tensor[T]) -> Unit {
 }
 
 ///|
-impl[T : Element + Show] Show for Tensor[T] with output(self, logger) {
+pub impl[T : Element + Show] Show for Tensor[T] with output(self, logger) {
   let shape = self.shape().rev()
   let vec = self.get_raw_data()
   logger.write_string("Tensor(")
