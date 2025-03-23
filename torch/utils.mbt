@@ -104,8 +104,8 @@ fn int_16_array_to_bytes(ints : Array[Int16]) -> Bytes {
   let n = ints.length()
   let bytes_arr : FixedArray[Byte] = FixedArray::make(n * 2, 0)
   for i in 0..<n {
-    bytes_arr[i * 2] = (ints[i] & 0xff).to_byte()
-    bytes_arr[i * 2 + 1] = ((ints[i] >> 8) & 0xff).to_byte()
+    bytes_arr[i * 2] = (ints[i].to_int() & 0xff).to_byte()
+    bytes_arr[i * 2 + 1] = ((ints[i].to_int() >> 8) & 0xff).to_byte()
   }
   Bytes::from_fixedarray(bytes_arr)
 }
