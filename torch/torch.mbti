@@ -1,11 +1,45 @@
 package liuly0322/tch_mbt/torch
 
 // Values
+fn abs[T](Tensor[T]) -> Tensor[T]
+
+fn argmax[T](Tensor[T]) -> Tensor[Int64]
+
+fn argmin[T](Tensor[T]) -> Tensor[Int64]
+
+fn drop[T](Tensor[T]) -> Unit
+
+fn exp[T, U](Tensor[T]) -> Tensor[U]
+
+fn forward[U, V](Model, Tensor[U]) -> Tensor[V]
+
+fn get_raw_data[T : Element](Tensor[T]) -> Array[T]
+
+fn length[T](Tensor[T]) -> Int
+
 fn load_model_from_file(String) -> Model
+
+fn log[T, U](Tensor[T]) -> Tensor[U]
+
+fn matmul[T](Tensor[T], Tensor[T]) -> Tensor[T]
+
+fn op_add[T](Tensor[T], Tensor[T]) -> Tensor[T]
+
+fn op_mul[T](Tensor[T], Tensor[T]) -> Tensor[T]
+
+fn op_neg[T](Tensor[T]) -> Tensor[T]
+
+fn op_sub[T](Tensor[T], Tensor[T]) -> Tensor[T]
+
+fn reshape[T](Tensor[T], Array[Int]) -> Tensor[T]
+
+fn shape[T](Tensor[T]) -> Array[Int]
 
 fn tensor_from_array[T : Element](Array[T]) -> Tensor[T]
 
 fn tensor_from_file[T : Element](String) -> Tensor[T]
+
+fn transpose[T](Tensor[T]) -> Tensor[T]
 
 // Types and methods
 pub struct Model {
