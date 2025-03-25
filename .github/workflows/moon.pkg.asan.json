@@ -4,8 +4,5 @@
             "cc-flags": "-fsanitize=address -L. -ltchproxy"
         }
     },
-    "native-stub": [
-        "native_stub.c"
-    ],
     "warn-list": "-5"
 }

@@ -2,7 +2,8 @@
 
 Using libtorch in MoonBit.
 
-For [some native link reason](https://github.com/moonbitlang/x/issues/70#issuecomment-2469536770), it's now a starter template instead of a library.
+> [!NOTE]  
+> It's a starter template instead of a library.
 
 ## Setup
 
@@ -36,12 +37,7 @@ test "inference" {
     let output_argmax = output.argmax()
     let index_max = output_argmax.get_raw_data()[0]
     assert_eq!(index_max, expected_answers[i].to_int64())
-    input.drop()
-    input_resized.drop()
-    output.drop()
-    output_argmax.drop()
   }
-  model.drop()
 }
 ```
 
@@ -51,7 +47,7 @@ Check the full list in [torch.mbti](torch/torch.mbti).
 
 ## How it works
 
-tch_mbt uses the default cc to compile the native backend of MoonBit. However, libtorch is a C++ library and requires a build system like CMake. To bridge the gap, tch_mbt will first build a shared "C" library "tchproxy".
+While libtorch offers a C++ API, FFI wrappers are needed on top of it. However writing C++ code over libtorch requires a build system like CMake. So we first build a shared library "tchproxy", then link it with MoonBit.
 
 ```json
 {
@@ -59,14 +55,9 @@ tch_mbt uses the default cc to compile the native backend of MoonBit. However, l
         "native": {
             "cc-flags": "-L. -ltchproxy"
         }
-    },
-    "native-stub": [
-        "native_stub.c"
-    ]
+    }
 }
 ```
-
-`native_stub.c` is here for interoperability, wrapping FFIs that either the arguments or the return value is a MoonBit object.
 
 ## Roadmap & TODOs
 
@@ -75,7 +66,7 @@ tch_mbt uses the default cc to compile the native backend of MoonBit. However, l
 - [x] Build an real inference model demo.
 - [ ] Add more tensor operations.
 - [ ] Add more neural network operations.
-- [ ] Enhance build experience.
+- [ ] Support static build (see [tch-rs](https://github.com/LaurentMazare/tch-rs) for building `libtorch.a`).
 
 ## License
 

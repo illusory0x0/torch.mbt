@@ -5,10 +5,6 @@ test "demo" {
   let reshape_b = tensor_b.reshape([6, 1])
   let tensor_c = tensor_a.matmul(reshape_b)
   inspect!(tensor_c, content="Tensor([56])")
-  tensor_a.drop()
-  tensor_b.drop()
-  reshape_b.drop()
-  tensor_c.drop()
   let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
   let tensor_b = -tensor_a
   inspect!(tensor_b, content="Tensor([-1, -2, -3, -4, -5, -6])")
@@ -27,10 +23,5 @@ test "inference" {
     let output_argmax = output.argmax()
     let index_max = output_argmax.get_raw_data()[0]
     assert_eq!(index_max, expected_answers[i].to_int64())
-    input.drop()
-    input_resized.drop()
-    output.drop()
-    output_argmax.drop()
   }
-  model.drop()
 }

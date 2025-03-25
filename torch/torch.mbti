@@ -7,8 +7,6 @@ fn argmax[T](Tensor[T]) -> Tensor[Int64]
 
 fn argmin[T](Tensor[T]) -> Tensor[Int64]
 
-fn drop[T](Tensor[T]) -> Unit
-
 fn exp[T, U](Tensor[T]) -> Tensor[U]
 
 fn forward[U, V](Model, Tensor[U]) -> Tensor[V]
@@ -43,21 +41,21 @@ fn transpose[T](Tensor[T]) -> Tensor[T]
 
 // Types and methods
 pub struct Model {
-  id : Int64
+  object : ModelObject
 }
 impl Model {
-  drop(Self) -> Unit
   forward[U, V](Self, Tensor[U]) -> Tensor[V]
 }
 
+type ModelObject
+
 pub struct Tensor[T] {
-  id : Int64
+  object : TensorObject
 }
 impl Tensor {
   abs[T](Self[T]) -> Self[T]
   argmax[T](Self[T]) -> Self[Int64]
   argmin[T](Self[T]) -> Self[Int64]
-  drop[T](Self[T]) -> Unit
   exp[T, U](Self[T]) -> Self[U]
   get_raw_data[T : Element](Self[T]) -> Array[T]
   length[T](Self[T]) -> Int
@@ -73,6 +71,8 @@ impl Tensor {
 }
 impl[T] Eq for Tensor[T]
 impl[T : Element + Show] Show for Tensor[T]
+
+type TensorObject
 
 // Type aliases
 

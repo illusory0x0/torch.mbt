@@ -161,106 +161,101 @@ impl Element for Double with to_vec(bytes) {
 
 ///|
 pub struct Tensor[T] {
-  id : Int64
+  object : TensorObject
 }
 
 ///|
 pub fn get_raw_data[T : Element](self : Tensor[T]) -> Array[T] {
-  T::to_vec(get_tensor_raw_ffi(self.id))
+  T::to_vec(get_tensor_raw_ffi(self.object))
 }
 
 ///|
 pub fn reshape[T](self : Tensor[T], dims : Array[Int]) -> Tensor[T] {
   let ndims = dims.length().reinterpret_as_uint()
   let dims = dims.map(fn(x) { x.to_int64() }) |> int_64_array_to_bytes
-  let id = reshape_ffi(self.id, dims, ndims)
-  { id, }
+  let object = reshape_ffi(self.object, dims, ndims)
+  { object, }
 }
 
 ///|
 pub fn abs[T](self : Tensor[T]) -> Tensor[T] {
-  let id = abs_tensor_ffi(self.id)
-  { id, }
+  let object = abs_tensor_ffi(self.object)
+  { object, }
 }
 
 ///|
 pub fn exp[T, U](self : Tensor[T]) -> Tensor[U] {
-  let id = exp_tensor_ffi(self.id)
-  { id, }
+  let object = exp_tensor_ffi(self.object)
+  { object, }
 }
 
 ///|
 pub fn log[T, U](self : Tensor[T]) -> Tensor[U] {
-  let id = log_tensor_ffi(self.id)
-  { id, }
+  let object = log_tensor_ffi(self.object)
+  { object, }
 }
 
 ///|
 pub fn op_add[T](self : Tensor[T], other : Tensor[T]) -> Tensor[T] {
-  let id = add_tensors_ffi(self.id, other.id)
-  { id, }
+  let object = add_tensors_ffi(self.object, other.object)
+  { object, }
 }
 
 ///|
 pub fn op_sub[T](self : Tensor[T], other : Tensor[T]) -> Tensor[T] {
-  let id = sub_tensors_ffi(self.id, other.id)
-  { id, }
+  let object = sub_tensors_ffi(self.object, other.object)
+  { object, }
 }
 
 ///|
 pub fn op_neg[T](self : Tensor[T]) -> Tensor[T] {
-  let id = neg_tensor_ffi(self.id)
-  { id, }
+  let object = neg_tensor_ffi(self.object)
+  { object, }
 }
 
 ///|
 pub impl[T] Eq for Tensor[T] with op_equal(self : Tensor[T], other : Tensor[T]) {
-  equal_tensors_ffi(self.id, other.id) == 1
+  equal_tensors_ffi(self.object, other.object) == 1
 }
 
 ///|
 pub fn op_mul[T](self : Tensor[T], other : Tensor[T]) -> Tensor[T] {
-  let id = mul_tensors_ffi(self.id, other.id)
-  { id, }
+  let object = mul_tensors_ffi(self.object, other.object)
+  { object, }
 }
 
 ///|
 pub fn matmul[T](self : Tensor[T], other : Tensor[T]) -> Tensor[T] {
-  let id = matmul_tensors_ffi(self.id, other.id)
-  { id, }
+  let object = matmul_tensors_ffi(self.object, other.object)
+  { object, }
 }
 
 ///|
 pub fn transpose[T](self : Tensor[T]) -> Tensor[T] {
-  let id = transpose_tensor_ffi(self.id)
-  { id, }
+  let object = transpose_tensor_ffi(self.object)
+  { object, }
 }
 
 ///|
 pub fn length[T](self : Tensor[T]) -> Int {
-  get_tensor_length_ffi(self.id)
+  get_tensor_length_ffi(self.object)
 }
 
 ///|
 pub fn shape[T](self : Tensor[T]) -> Array[Int] {
-  get_tensor_shape_ffi(self.id) |> bytes_to_int_array
+  get_tensor_shape_ffi(self.object) |> bytes_to_int_array
 }
 
 ///|
 pub fn argmin[T](self : Tensor[T]) -> Tensor[Int64] {
-  let id = argmin_tensor_ffi(self.id)
-  { id, }
+  let object = argmin_tensor_ffi(self.object)
+  { object, }
 }
 
 ///|
 pub fn argmax[T](self : Tensor[T]) -> Tensor[Int64] {
-  let id = argmax_tensor_ffi(self.id)
-  { id, }
-}
-
-///|
-pub fn drop[T](self : Tensor[T]) -> Unit {
-  drop_torch_object(self.id)
+  let object = argmax_tensor_ffi(self.object)
+  { object, }
 }
 
 ///|
@@ -314,10 +309,10 @@ fn at_tensor_of_data[T](
   _type : Int
 ) -> Tensor[T] {
   let dims = dims.map(fn(x) { x.to_int64() }) |> int_64_array_to_bytes
-  let id = at_tensor_of_data_ffi(
+  let object = at_tensor_of_data_ffi(
     data_ptr, dims, ndims, element_size_in_bytes, _type,
   )
-  { id, }
+  { object, }
 }
 
 ///|
@@ -335,8 +330,8 @@ pub fn tensor_from_array[T : Element](arr : Array[T]) -> Tensor[T] {
 ///|
 pub fn tensor_from_file[T : Element](path : String) -> Tensor[T] {
   let path = mbt_string_to_utf8_bytes(path, true)
-  let id = load_tensor_from_file_ffi(path)
-  { id, }
+  let object = load_tensor_from_file_ffi(path)
+  { object, }
 }
 
 ///|
@@ -345,8 +340,6 @@ test "tensor" {
   inspect!(tensor_a, content="Tensor([1, 2, 3, 4, 5, 6])")
   let tensor_b = tensor_from_array([1, 2, 3])
   inspect!(tensor_b, content="Tensor([1, 2, 3])")
-  tensor_a.drop()
-  tensor_b.drop()
 }
 
 ///|
@@ -354,8 +347,6 @@ test "tensor_abs" {
   let tensor_a = tensor_from_array([-1.0, -2.0, -3.0, -4.0, -5.0, -6.0])
   let tensor_b = tensor_a.abs()
   inspect!(tensor_b, content="Tensor([1, 2, 3, 4, 5, 6])")
-  tensor_a.drop()
-  tensor_b.drop()
 }
 
 ///|
@@ -366,8 +357,6 @@ test "tensor_exp" {
     tensor_b,
     content="Tensor([2.718281828459045, 7.38905609893065, 20.085536923187668, 54.598150033144236, 148.4131591025766, 403.4287934927351])",
   )
-  tensor_a.drop()
-  tensor_b.drop()
 }
 
 ///|
@@ -378,8 +367,6 @@ test "tensor_log" {
     tensor_b,
     content="Tensor([0, 0.6931471805599453, 1.0986122886681098, 1.3862943611198906, 1.6094379124341003, 1.791759469228055])",
   )
-  tensor_a.drop()
-  tensor_b.drop()
 }
 
 ///|
@@ -388,9 +375,6 @@ test "tensor_add" {
   let tensor_b = tensor_from_array([6.0, 5.0, 4.0, 3.0, 2.0, 1.0])
   let tensor_c = tensor_a + tensor_b
   inspect!(tensor_c, content="Tensor([7, 7, 7, 7, 7, 7])")
-  tensor_a.drop()
-  tensor_b.drop()
-  tensor_c.drop()
 }
 
 ///|
@@ -398,8 +382,6 @@ test "tensor_neg" {
   let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
   let tensor_b = -tensor_a
   inspect!(tensor_b, content="Tensor([-1, -2, -3, -4, -5, -6])")
-  tensor_a.drop()
-  tensor_b.drop()
 }
 
 ///|
@@ -408,9 +390,6 @@ test "tensor_sub" {
   let tensor_b = tensor_from_array([6.0, 5.0, 4.0, 3.0, 2.0, 1.0])
   let tensor_c = tensor_a - tensor_b
   inspect!(tensor_c, content="Tensor([-5, -3, -1, 1, 3, 5])")
-  tensor_a.drop()
-  tensor_b.drop()
-  tensor_c.drop()
 }
 
 ///|
@@ -419,9 +398,6 @@ test "tensor_mul" {
   let tensor_b = tensor_from_array([6.0, 5.0, 4.0, 3.0, 2.0, 1.0])
   let tensor_c = tensor_a * tensor_b
   inspect!(tensor_c, content="Tensor([6, 10, 12, 12, 10, 6])")
-  tensor_a.drop()
-  tensor_b.drop()
-  tensor_c.drop()
 }
 
 ///|
@@ -431,10 +407,6 @@ test "tensor_matmul" {
   let reshape_b = tensor_b.reshape([6, 1])
   let tensor_c = tensor_a.matmul(reshape_b)
   inspect!(tensor_c, content="Tensor([56])")
-  tensor_a.drop()
-  tensor_b.drop()
-  reshape_b.drop()
-  tensor_c.drop()
 }
 
 ///|
@@ -443,9 +415,6 @@ test "tensor_transpose" {
   let reshape_a = tensor_a.reshape([2, 3])
   let tensor_b = reshape_a.transpose()
   inspect!(tensor_b, content="Tensor([[1, 4], [2, 5], [3, 6]])")
-  tensor_a.drop()
-  reshape_a.drop()
-  tensor_b.drop()
 }
 
 ///|
@@ -458,8 +427,6 @@ test "tensor_length" {
   let length = tensor_b.length()
   inspect!(length, content="1")
   inspect!(tensor_b, content="Tensor(1)")
-  tensor_a.drop()
-  tensor_b.drop()
 }
 
 ///|
@@ -467,7 +434,6 @@ test "tensor_shape" {
   let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
   let shape = tensor_a.shape()
   inspect!(shape, content="[6]")
-  tensor_a.drop()
 }
 
 ///|
@@ -475,8 +441,6 @@ test "tensor_argmin" {
   let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
   let tensor_b = tensor_a.argmin()
   inspect!(tensor_b, content="Tensor(0)")
-  tensor_a.drop()
-  tensor_b.drop()
 }
 
 ///|
@@ -484,8 +448,6 @@ test "tensor_argmax" {
   let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
   let tensor_b = tensor_a.argmax()
   inspect!(tensor_b, content="Tensor(5)")
-  tensor_a.drop()
-  tensor_b.drop()
 }
 
 ///|
@@ -495,9 +457,6 @@ test "tensor_allclose" {
   let tensor_c = tensor_from_array([6.0, 5.0, 4.0, 3.0, 2.0, 1.0])
   assert_true!(tensor_a == tensor_b)
   assert_false!(tensor_a == tensor_c)
-  tensor_a.drop()
-  tensor_b.drop()
-  tensor_c.drop()
 }
 
 ///|
@@ -505,6 +464,4 @@ test "reshape" {
   let tensor_a = tensor_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
   let tensor_b = tensor_a.reshape([2, 3])
   inspect!(tensor_b, content="Tensor([[1, 2, 3], [4, 5, 6]])")
-  tensor_a.drop()
-  tensor_b.drop()
 }

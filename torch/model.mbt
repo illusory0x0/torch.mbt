@@ -1,22 +1,17 @@
 ///|
 pub struct Model {
-  id : Int64
+  object : ModelObject
 }
 
 ///|
 pub fn load_model_from_file(path : String) -> Model {
   let path = mbt_string_to_utf8_bytes(path, true)
-  let id = load_model_ffi(path)
-  { id, }
+  let object = load_model_ffi(path)
+  { object, }
 }
 
 ///|
 pub fn forward[U, V](self : Model, input : Tensor[U]) -> Tensor[V] {
-  let id = forward_ffi(self.id, input.id)
-  { id, }
-}
-
-///|
-pub fn Model::drop(self : Model) -> Unit {
-  drop_torch_object(self.id)
+  let object = forward_ffi(self.object, input.object)
+  { object, }
 }

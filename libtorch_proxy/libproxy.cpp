@@ -8,24 +8,6 @@
 #include <variant>
 #include <vector>
 
-using torch_object_id = int64_t;
-
-using torch_object = std::variant<torch::Tensor, torch::jit::script::Module>;
-
-std::atomic<torch_object_id> next_id{0};
-
-torch_object_id create_new_id() {
-    return next_id.fetch_add(1, std::memory_order_relaxed);
-}
-
-std::unordered_map<torch_object_id, torch_object> global_torch_map;
-
-torch_object_id insert_new_torch_object(torch_object tensor) {
-    torch_object_id new_id = create_new_id();
-    global_torch_map.insert({new_id, std::move(tensor)});
-    return new_id;
-}
-
 std::vector<char> get_the_bytes(std::string filename) {
     std::ifstream input(filename, std::ios::binary);
     std::vector<char> bytes((std::istreambuf_iterator<char>(input)),
@@ -36,176 +18,197 @@ std::vector<char> get_the_bytes(std::string filename) {
 }
 
 extern "C" {
+#include "moonbit.h"
+struct tensor_object_internal {
+    torch::Tensor *object;
+};
+
+void tensor_object_internal_delete(void *object) {
+    struct tensor_object_internal *obj =
+        (struct tensor_object_internal *)object;
+    delete obj->object;
+}
+
+struct tensor_object_internal *
+tensor_object_internal_new(torch::Tensor object) {
+    struct tensor_object_internal *obj =
+        (struct tensor_object_internal *)moonbit_make_external_object(
+            tensor_object_internal_delete,
+            sizeof(struct tensor_object_internal));
+    obj->object = new torch::Tensor(object);
+    return obj;
+}
+
 // https://github.com/pytorch/pytorch/issues/20356#issuecomment-1061667333
 // f**k libtorch
-torch_object_id load_tensor_from_file_internal(char *path) {
+tensor_object_internal *load_tensor_from_file_internal(moonbit_bytes_t path) {
     try {
-        std::vector<char> f = get_the_bytes(path);
+        std::vector<char> f = get_the_bytes((char *)path);
+        moonbit_decref(path);
         torch::IValue x = torch::pickle_load(f);
         torch::Tensor tensor = x.toTensor();
-        return insert_new_torch_object(std::move(tensor));
+        return tensor_object_internal_new(tensor);
     } catch (const c10::Error &e) {
         std::cerr << "error loading the tensor\n"
                   << e.what() << "\n"
                   << path << std::endl;
-        return -1;
+        moonbit_decref(path);
+        return nullptr;
     }
 }
 
-torch_object_id at_tensor_of_data_internal(void *vs, int64_t *dims,
-                                           size_t ndims,
-                                           size_t element_size_in_bytes,
-                                           int type) {
+tensor_object_internal *at_tensor_of_data_internal(moonbit_bytes_t vs,
+                                                   moonbit_bytes_t dims,
+                                                   size_t ndims,
+                                                   size_t element_size_in_bytes,
+                                                   int type) {
+    auto dims_ = (int64_t *)dims;
     torch::Tensor tensor =
-        torch::zeros(torch::IntArrayRef(dims, ndims), torch::ScalarType(type));
+        torch::zeros(torch::IntArrayRef(dims_, ndims), torch::ScalarType(type));
     if ((int64_t)element_size_in_bytes != tensor.element_size())
         throw std::invalid_argument("incoherent element sizes in bytes");
     void *tensor_data = tensor.data_ptr();
     memcpy(tensor_data, vs, tensor.numel() * element_size_in_bytes);
-    return insert_new_torch_object(std::move(tensor));
+    moonbit_decref(vs);
+    moonbit_decref(dims);
+    return tensor_object_internal_new(tensor);
 }
 
-torch_object_id reshape_internal(torch_object_id global_id, int64_t *dims,
-                                 size_t ndims) {
-    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
-    auto result = tensor.reshape(torch::IntArrayRef(dims, ndims));
-    return insert_new_torch_object(std::move(result));
+tensor_object_internal *reshape_internal(tensor_object_internal *tensor,
+                                         moonbit_bytes_t dims, size_t ndims) {
+    auto result =
+        tensor->object->reshape(torch::IntArrayRef((int64_t *)dims, ndims));
+    moonbit_decref(dims);
+    return tensor_object_internal_new(result);
 }
 
-void get_tensor_raw_internal(torch_object_id global_id, unsigned char *data,
-                             int n) {
-    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
-    torch::Tensor contiguous_tensor = tensor.contiguous();
+moonbit_bytes_t get_tensor_raw_internal(tensor_object_internal *tensor) {
+    torch::Tensor contiguous_tensor = tensor->object->contiguous();
     void *tensor_data = contiguous_tensor.data_ptr();
     auto size = contiguous_tensor.numel() * contiguous_tensor.element_size();
-    if (n != size) {
-        throw std::invalid_argument("incoherent size");
-    }
-    memcpy(data, tensor_data, size);
+    moonbit_bytes_t bytes = moonbit_make_bytes(size, 0);
+    memcpy(bytes, tensor_data, size);
+    return bytes;
 }
 
-int get_tensor_length_internal(torch_object_id global_id) {
-    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
-    return tensor.numel();
+int get_tensor_length_internal(tensor_object_internal *tensor) {
+    return tensor->object->numel();
 }
 
-int get_tensor_element_size_internal(torch_object_id global_id) {
-    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
-    return tensor.element_size();
+moonbit_bytes_t get_tensor_shape_internal(tensor_object_internal *tensor) {
+    std::vector<unsigned> vec(tensor->object->sizes().begin(),
+                              tensor->object->sizes().end());
+    moonbit_bytes_t bytes =
+        moonbit_make_bytes(vec.size() * sizeof(unsigned), 0);
+    memcpy(bytes, vec.data(), vec.size() * sizeof(unsigned));
+    return bytes;
 }
 
-int get_tensor_shape_internal(torch_object_id global_id, unsigned **shape) {
-    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
-    std::vector<unsigned> vec(tensor.sizes().begin(), tensor.sizes().end());
-    *shape = (unsigned *)malloc(vec.size() * sizeof(unsigned));
-    memcpy(*shape, vec.data(), vec.size() * sizeof(unsigned));
-    return vec.size();
+tensor_object_internal *abs_tensor_internal(tensor_object_internal *tensor) {
+    torch::Tensor result = torch::abs(*(tensor->object));
+    return tensor_object_internal_new(result);
 }
 
-void drop_torch_object_internal(torch_object_id global_id) {
-    global_torch_map.erase(global_id);
+tensor_object_internal *exp_tensor_internal(tensor_object_internal *tensor) {
+    torch::Tensor result = torch::exp(*(tensor->object));
+    return tensor_object_internal_new(result);
 }
 
-torch_object_id abs_tensor_internal(torch_object_id global_id) {
-    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
-    torch::Tensor result = torch::abs(tensor);
-    return insert_new_torch_object(std::move(result));
+tensor_object_internal *log_tensor_internal(tensor_object_internal *tensor) {
+    torch::Tensor result = torch::log(*(tensor->object));
+    return tensor_object_internal_new(result);
 }
 
-torch_object_id exp_tensor_internal(torch_object_id global_id) {
-    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
-    torch::Tensor result = torch::exp(tensor);
-    return insert_new_torch_object(std::move(result));
+tensor_object_internal *add_tensors_internal(tensor_object_internal *tensor1,
+                                             tensor_object_internal *tensor2) {
+    torch::Tensor result = *tensor1->object + *tensor2->object;
+    return tensor_object_internal_new(result);
 }
 
-torch_object_id log_tensor_internal(torch_object_id global_id) {
-    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
-    torch::Tensor result = torch::log(tensor);
-    return insert_new_torch_object(std::move(result));
+tensor_object_internal *neg_tensor_internal(tensor_object_internal *tensor) {
+    torch::Tensor result = -*tensor->object;
+    return tensor_object_internal_new(result);
 }
 
-torch_object_id add_tensors_internal(torch_object_id global_id1,
-                                     torch_object_id global_id2) {
-    auto &tensor1 = std::get<torch::Tensor>(global_torch_map[global_id1]);
-    auto &tensor2 = std::get<torch::Tensor>(global_torch_map[global_id2]);
-    torch::Tensor result = tensor1 + tensor2;
-    return insert_new_torch_object(std::move(result));
+tensor_object_internal *sub_tensors_internal(tensor_object_internal *tensor1,
+                                             tensor_object_internal *tensor2) {
+    torch::Tensor result = *tensor1->object - *tensor2->object;
+    return tensor_object_internal_new(result);
 }
 
-torch_object_id neg_tensor_internal(torch_object_id global_id) {
-    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
-    torch::Tensor result = -tensor;
-    return insert_new_torch_object(std::move(result));
+int equal_tensors_internal(tensor_object_internal *tensor1,
+                           tensor_object_internal *tensor2) {
+    return torch::allclose(*tensor1->object, *tensor2->object);
 }
 
-torch_object_id sub_tensors_internal(torch_object_id global_id1,
-                                     torch_object_id global_id2) {
-    auto &tensor1 = std::get<torch::Tensor>(global_torch_map[global_id1]);
-    auto &tensor2 = std::get<torch::Tensor>(global_torch_map[global_id2]);
-    torch::Tensor result = tensor1 - tensor2;
-    return insert_new_torch_object(std::move(result));
+tensor_object_internal *mul_tensors_internal(tensor_object_internal *tensor1,
+                                             tensor_object_internal *tensor2) {
+    torch::Tensor result = *tensor1->object * *tensor2->object;
+    return tensor_object_internal_new(result);
 }
 
-int equal_tensors_internal(torch_object_id global_id1,
-                           torch_object_id global_id2) {
-    auto &tensor1 = std::get<torch::Tensor>(global_torch_map[global_id1]);
-    auto &tensor2 = std::get<torch::Tensor>(global_torch_map[global_id2]);
-    return torch::allclose(tensor1, tensor2);
+tensor_object_internal *
+matmul_tensors_internal(tensor_object_internal *tensor1,
+                        tensor_object_internal *tensor2) {
+    torch::Tensor result = torch::matmul(*tensor1->object, *tensor2->object);
+    return tensor_object_internal_new(result);
 }
 
-torch_object_id mul_tensors_internal(torch_object_id global_id1,
-                                     torch_object_id global_id2) {
-    auto &tensor1 = std::get<torch::Tensor>(global_torch_map[global_id1]);
-    auto &tensor2 = std::get<torch::Tensor>(global_torch_map[global_id2]);
-    torch::Tensor result = tensor1 * tensor2;
-    return insert_new_torch_object(std::move(result));
+tensor_object_internal *
+transpose_tensor_internal(tensor_object_internal *tensor) {
+    torch::Tensor result = tensor->object->t();
+    return tensor_object_internal_new(result);
 }
 
-torch_object_id matmul_tensors_internal(torch_object_id global_id1,
-                                        torch_object_id global_id2) {
-    auto &tensor1 = std::get<torch::Tensor>(global_torch_map[global_id1]);
-    auto &tensor2 = std::get<torch::Tensor>(global_torch_map[global_id2]);
-    torch::Tensor result = torch::matmul(tensor1, tensor2);
-    return insert_new_torch_object(std::move(result));
+tensor_object_internal *argmin_tensor_internal(tensor_object_internal *tensor) {
+    torch::Tensor result = torch::argmin(*(tensor->object));
+    return tensor_object_internal_new(result);
 }
 
-torch_object_id transpose_tensor_internal(torch_object_id global_id) {
-    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
-    torch::Tensor result = tensor.t();
-    return insert_new_torch_object(std::move(result));
+tensor_object_internal *argmax_tensor_internal(tensor_object_internal *tensor) {
+    torch::Tensor result = torch::argmax(*(tensor->object));
+    return tensor_object_internal_new(result);
 }
 
-torch_object_id argmin_tensor_internal(torch_object_id global_id) {
-    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
-    torch::Tensor result = torch::argmin(tensor);
-    return insert_new_torch_object(std::move(result));
+struct module_object_internal {
+    torch::jit::script::Module *object;
+};
+
+void module_object_internal_delete(void *object) {
+    struct module_object_internal *obj =
+        (struct module_object_internal *)object;
+    delete obj->object;
 }
 
-torch_object_id argmax_tensor_internal(torch_object_id global_id) {
-    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id]);
-    torch::Tensor result = torch::argmax(tensor);
-    return insert_new_torch_object(std::move(result));
+struct module_object_internal *
+module_object_internal_new(torch::jit::script::Module object) {
+    struct module_object_internal *obj =
+        (struct module_object_internal *)moonbit_make_external_object(
+            module_object_internal_delete,
+            sizeof(struct module_object_internal));
+    obj->object = new torch::jit::script::Module(object);
+    return obj;
 }
 
-torch_object_id load_model_internal(char *path) {
+module_object_internal *load_model_internal(moonbit_bytes_t path) {
     torch::jit::script::Module module;
     try {
-        module = torch::jit::load(path);
+        module = torch::jit::load((char *)path);
     } catch (const c10::Error &e) {
         std::cerr << "error loading the model\n"
                   << e.what() << "\n"
                   << path << std::endl;
-        return -1;
+        moonbit_decref(path);
+        return nullptr;
     }
-    return insert_new_torch_object(std::move(module));
+    moonbit_decref(path);
+    return module_object_internal_new(module);
 }
 
-torch_object_id forward_internal(torch_object_id global_id,
-                                 torch_object_id global_id2) {
-    auto &module =
-        std::get<torch::jit::script::Module>(global_torch_map[global_id]);
-    auto &tensor = std::get<torch::Tensor>(global_torch_map[global_id2]);
-    torch::Tensor result = module.forward({tensor}).toTensor();
-    return insert_new_torch_object(std::move(result));
+tensor_object_internal *forward_internal(module_object_internal *module,
+                                         tensor_object_internal *tensor) {
+    torch::Tensor result =
+        module->object->forward({*tensor->object}).toTensor();
+    return tensor_object_internal_new(result);
 }
 }
