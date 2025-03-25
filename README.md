@@ -27,16 +27,14 @@ Change code in `torch/torch.mbt` and run `bash build.sh` to test.
 // You can check the images in python_examples/mnist/samples.
 test "inference" {
   let model = load_model_from_file("python_examples/mnist/mnist_cnn.pt")
+  let input_shape = [1, 1, 28, 28]
   let cases = ["1", "2", "3", "4", "5"]
   let expected_answers = [7, 2, 1, 0, 4]
   for i in 0..<5 {
     let filename = "python_examples/mnist/samples/mnist_" + cases[i] + ".pt"
-    let input : Tensor[Float] = tensor_from_file(filename)
-    let input_resized = input.reshape([1, 1, 28, 28])
-    let output : Tensor[Float] = model.forward(input_resized)
-    let output_argmax = output.argmax()
-    let index_max = output_argmax.get_raw_data()[0]
-    assert_eq!(index_max, expected_answers[i].to_int64())
+    let input : Tensor[Float] = tensor_from_file(filename).reshape(input_shape)
+    let output = model.forward(input).argmax().get_raw_data()[0]
+    assert_eq!(output, expected_answers[i].to_int64())
   }
 }
 ```
