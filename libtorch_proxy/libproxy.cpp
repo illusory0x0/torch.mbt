@@ -19,22 +19,19 @@ std::vector<char> get_the_bytes(std::string filename) {
 
 extern "C" {
 #include "moonbit.h"
-struct tensor_object_internal {
+union tensor_object_internal {
     torch::Tensor object;
 };
 
 void tensor_object_internal_delete(void *object) {
-    struct tensor_object_internal *obj =
-        (struct tensor_object_internal *)object;
+    tensor_object_internal *obj = (tensor_object_internal *)object;
     obj->object.~Tensor();
 }
 
-struct tensor_object_internal *
-tensor_object_internal_new(torch::Tensor object) {
-    struct tensor_object_internal *obj =
-        (struct tensor_object_internal *)moonbit_make_external_object(
-            tensor_object_internal_delete,
-            sizeof(struct tensor_object_internal));
+tensor_object_internal *tensor_object_internal_new(torch::Tensor object) {
+    tensor_object_internal *obj =
+        (tensor_object_internal *)moonbit_make_external_object(
+            tensor_object_internal_delete, sizeof(tensor_object_internal));
     new (&obj->object) torch::Tensor(object);
     return obj;
 }
@@ -170,22 +167,20 @@ tensor_object_internal *argmax_tensor_internal(tensor_object_internal *tensor) {
     return tensor_object_internal_new(result);
 }
 
-struct module_object_internal {
+union module_object_internal {
     torch::jit::script::Module object;
 };
 
 void module_object_internal_delete(void *object) {
-    struct module_object_internal *obj =
-        (struct module_object_internal *)object;
+    module_object_internal *obj = (module_object_internal *)object;
     obj->object.~Module();
 }
 
-struct module_object_internal *
+module_object_internal *
 module_object_internal_new(torch::jit::script::Module object) {
-    struct module_object_internal *obj =
-        (struct module_object_internal *)moonbit_make_external_object(
-            module_object_internal_delete,
-            sizeof(struct module_object_internal));
+    module_object_internal *obj =
+        (module_object_internal *)moonbit_make_external_object(
+            module_object_internal_delete, sizeof(module_object_internal));
     new (&obj->object) torch::jit::script::Module(object);
     return obj;
 }
@@ -207,8 +202,7 @@ module_object_internal *load_model_internal(moonbit_bytes_t path) {
 
 tensor_object_internal *forward_internal(module_object_internal *module,
                                          tensor_object_internal *tensor) {
-    torch::Tensor result =
-        module->object.forward({tensor->object}).toTensor();
+    torch::Tensor result = module->object.forward({tensor->object}).toTensor();
     return tensor_object_internal_new(result);
 }
 }
