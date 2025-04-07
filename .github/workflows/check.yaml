@@ -101,7 +101,7 @@ jobs:
           moonrun --version
 
       - name: moon check
-        run: moon check 
+        run: moon check --target native 
 
       - name: build
         run:  bash .github/workflows/build.sh
