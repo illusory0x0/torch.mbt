@@ -1,4 +1,4 @@
-package liuly0322/tch_mbt/torch
+package "liuly0322/tch_mbt/torch"
 
 // Values
 fn abs[T](Tensor[T]) -> Tensor[T]
