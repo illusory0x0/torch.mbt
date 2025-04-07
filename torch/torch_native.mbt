@@ -5,6 +5,7 @@ type TensorObject
 type ModelObject
 
 ///|
+#borrow(data_ptr, dims)
 extern "C" fn at_tensor_of_data_ffi(
   data_ptr : Bytes,
   dims : Bytes,
@@ -14,6 +15,7 @@ extern "C" fn at_tensor_of_data_ffi(
 ) -> TensorObject = "at_tensor_of_data_internal"
 
 ///|
+#borrow(path)
 extern "C" fn load_tensor_from_file_ffi(path : Bytes) -> TensorObject = "load_tensor_from_file_internal"
 
 ///|
@@ -71,6 +73,7 @@ extern "C" fn matmul_tensors_ffi(
 extern "C" fn transpose_tensor_ffi(tensor_obj : TensorObject) -> TensorObject = "transpose_tensor_internal"
 
 ///|
+#borrow(dims)
 extern "C" fn reshape_ffi(
   tensor_obj : TensorObject,
   dims : Bytes,
@@ -84,6 +87,7 @@ extern "C" fn get_tensor_length_ffi(tensor_obj : TensorObject) -> Int = "get_ten
 extern "C" fn get_tensor_shape_ffi(tensor_obj : TensorObject) -> Bytes = "get_tensor_shape_internal"
 
 ///|
+#borrow(path)
 extern "C" fn load_model_ffi(path : Bytes) -> ModelObject = "load_model_internal"
 
 ///|

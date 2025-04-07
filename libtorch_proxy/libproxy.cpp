@@ -41,7 +41,6 @@ tensor_object_internal *tensor_object_internal_new(torch::Tensor object) {
 tensor_object_internal *load_tensor_from_file_internal(moonbit_bytes_t path) {
     try {
         std::vector<char> f = get_the_bytes((char *)path);
-        moonbit_decref(path);
         torch::IValue x = torch::pickle_load(f);
         torch::Tensor tensor = x.toTensor();
         return tensor_object_internal_new(tensor);
@@ -49,7 +48,6 @@ tensor_object_internal *load_tensor_from_file_internal(moonbit_bytes_t path) {
         std::cerr << "error loading the tensor\n"
                   << e.what() << "\n"
                   << path << std::endl;
-        moonbit_decref(path);
         return nullptr;
     }
 }
@@ -66,8 +64,6 @@ tensor_object_internal *at_tensor_of_data_internal(moonbit_bytes_t vs,
         throw std::invalid_argument("incoherent element sizes in bytes");
     void *tensor_data = tensor.data_ptr();
     memcpy(tensor_data, vs, tensor.numel() * element_size_in_bytes);
-    moonbit_decref(vs);
-    moonbit_decref(dims);
     return tensor_object_internal_new(tensor);
 }
 
@@ -75,7 +71,6 @@ tensor_object_internal *reshape_internal(tensor_object_internal *tensor,
                                          moonbit_bytes_t dims, size_t ndims) {
     auto result =
         tensor->object.reshape(torch::IntArrayRef((int64_t *)dims, ndims));
-    moonbit_decref(dims);
     return tensor_object_internal_new(result);
 }
 
@@ -193,10 +188,8 @@ module_object_internal *load_model_internal(moonbit_bytes_t path) {
         std::cerr << "error loading the model\n"
                   << e.what() << "\n"
                   << path << std::endl;
-        moonbit_decref(path);
         return nullptr;
     }
-    moonbit_decref(path);
     return module_object_internal_new(module);
 }
 
