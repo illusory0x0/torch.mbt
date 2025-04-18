@@ -25,8 +25,8 @@ priv enum ElementKind {
 ///|
 trait Element {
   kind(Self) -> ElementKind
-  elt_size_in_bytes(Self) -> UInt
-  c_int(Self) -> Int
+  elt_size_in_bytes(Self) -> UInt = _
+  c_int(Self) -> Int = _
   bytes(Array[Self]) -> Bytes
   to_vec(Bytes) -> Array[Self]
 }
