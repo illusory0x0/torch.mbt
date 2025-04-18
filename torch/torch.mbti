@@ -40,6 +40,14 @@ fn tensor_from_file[T : Element](String) -> Tensor[T]
 fn transpose[T](Tensor[T]) -> Tensor[T]
 
 // Types and methods
+pub enum ElementKind {
+  Int16
+  Int
+  Int64
+  Float
+  Double
+}
+
 pub struct Model {
   object : ModelObject
 }
@@ -77,5 +85,16 @@ type TensorObject
 // Type aliases
 
 // Traits
-trait Element
+pub(open) trait Element {
+  kind(Self) -> ElementKind
+  elt_size_in_bytes(Self) -> UInt = _
+  c_int(Self) -> Int = _
+  bytes(Array[Self]) -> Bytes
+  to_vec(Bytes) -> Array[Self]
+}
+impl Element for Int
+impl Element for Int16
+impl Element for Int64
+impl Element for Float
+impl Element for Double
 

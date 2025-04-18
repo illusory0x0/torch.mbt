@@ -1,5 +1,5 @@
 ///|
-priv enum ElementKind {
+pub enum ElementKind {
   // Uint8
   // Int8
   Int16
@@ -23,7 +23,7 @@ priv enum ElementKind {
 }
 
 ///|
-trait Element {
+pub(open) trait Element {
   kind(Self) -> ElementKind
   elt_size_in_bytes(Self) -> UInt = _
   c_int(Self) -> Int = _
@@ -85,77 +85,77 @@ impl Element with c_int(self) {
 }
 
 ///|
-impl Element for Int16 with kind(_) {
+pub impl Element for Int16 with kind(_) {
   ElementKind::Int16
 }
 
 ///|
-impl Element for Int16 with bytes(arr) {
+pub impl Element for Int16 with bytes(arr) {
   int_16_array_to_bytes(arr)
 }
 
 ///|
-impl Element for Int16 with to_vec(bytes) {
+pub impl Element for Int16 with to_vec(bytes) {
   bytes_to_int_16_array(bytes)
 }
 
 ///|
-impl Element for Int with kind(_) {
+pub impl Element for Int with kind(_) {
   ElementKind::Int
 }
 
 ///|
-impl Element for Int with bytes(arr) {
+pub impl Element for Int with bytes(arr) {
   int_array_to_bytes(arr)
 }
 
 ///|
-impl Element for Int with to_vec(bytes) {
+pub impl Element for Int with to_vec(bytes) {
   bytes_to_int_array(bytes)
 }
 
 ///|
-impl Element for Int64 with kind(_) {
+pub impl Element for Int64 with kind(_) {
   ElementKind::Int64
 }
 
 ///|
-impl Element for Int64 with bytes(arr) {
+pub impl Element for Int64 with bytes(arr) {
   int_64_array_to_bytes(arr)
 }
 
 ///|
-impl Element for Int64 with to_vec(bytes) {
+pub impl Element for Int64 with to_vec(bytes) {
   bytes_to_int_64_array(bytes)
 }
 
 ///|
-impl Element for Float with kind(_) {
+pub impl Element for Float with kind(_) {
   ElementKind::Float
 }
 
 ///|
-impl Element for Float with bytes(arr) {
+pub impl Element for Float with bytes(arr) {
   float_array_to_bytes(arr)
 }
 
 ///|
-impl Element for Float with to_vec(bytes) {
+pub impl Element for Float with to_vec(bytes) {
   bytes_to_float_array(bytes)
 }
 
 ///|
-impl Element for Double with kind(_) {
+pub impl Element for Double with kind(_) {
   ElementKind::Double
 }
 
 ///|
-impl Element for Double with bytes(arr) {
+pub impl Element for Double with bytes(arr) {
   double_array_to_bytes(arr)
 }
 
 ///|
-impl Element for Double with to_vec(bytes) {
+pub impl Element for Double with to_vec(bytes) {
   bytes_to_double_array(bytes)
 }
 

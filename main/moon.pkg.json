@@ -1,0 +1,14 @@
+{
+  "is-main": true,
+  "import": [
+    {
+      "path": "liuly0322/tch_mbt/torch",
+      "alias": "torch"
+    }
+  ],
+  "link": {
+    "native": {
+      "cc-link-flags": "-L. -ltchproxy"
+    }
+  }
+}

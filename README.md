@@ -12,29 +12,29 @@ Only Linux is supported.
 - Clone the repo.
 - Install libtorch (<https://pytorch.org/cppdocs/installing.html>).
 - Install CMake (and possibly "build-essential").
-- Edit `build.sh` to set the correct path of libtorch.
+- Edit `build.sh` to set the correct path of libtorch library.
 - Run `bash build.sh`.
 
 You are expected to see the unittests passed.
 
 ## Usage
 
-Change code in `torch/torch.mbt` and run `bash build.sh` to test.
+Change code in `main/main.mbt` and run `bash run.sh`.
 
 ```moonbit
-// torch/torch.mbt
 // Load a model and do inference on MNIST dataset.
 // You can check the images in python_examples/mnist/samples.
-test "inference" {
-  let model = load_model_from_file("python_examples/mnist/mnist_cnn.pt")
+fn main {
+  let model = @torch.load_model_from_file("python_examples/mnist/mnist_cnn.pt")
   let input_shape = [1, 1, 28, 28]
   let cases = ["1", "2", "3", "4", "5"]
   let expected_answers = [7, 2, 1, 0, 4]
   for i in 0..<5 {
     let filename = "python_examples/mnist/samples/mnist_" + cases[i] + ".pt"
-    let input : Tensor[Float] = tensor_from_file(filename).reshape(input_shape)
-    let output = model.forward(input).argmax().get_raw_data()[0]
-    assert_eq!(output, expected_answers[i].to_int64())
+    let input: @torch.Tensor[Float] = @torch.tensor_from_file(filename).reshape(input_shape)
+    let output: @torch.Tensor[Float] = model.forward(input)
+    let output = output.argmax().get_raw_data()[0]
+    println("Expected: " + expected_answers[i].to_string() + ", Output: " + output.to_string())
   }
 }
 ```
