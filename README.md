@@ -20,6 +20,9 @@ You are expected to see the unittests passed.
 
 Change code in `main/main.mbt` and run `bash run.sh`.
 
+> [!WARNING]
+> The `moon build` command will fail for [moon#674](https://github.com/moonbitlang/moon/issues/674), but it will successfully generate the executable, see `run.sh` for details.
+
 ```moonbit
 // Load a model and do inference on MNIST dataset.
 // You can check the images in python_examples/mnist/samples.
