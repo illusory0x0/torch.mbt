@@ -2,23 +2,64 @@
 
 Using libtorch in MoonBit.
 
-> [!NOTE]  
-> It's a starter template instead of a library.
+> [!NOTE]
+> Only Linux is supported.
 
-## Setup
+## Installation
 
-Only Linux is supported.
+You can either install from Mooncakes (as a library) or develop on top of this repo (as a starter template). 
 
-- Clone the repo.
+Either way requires:
+
 - Install libtorch (<https://pytorch.org/cppdocs/installing.html>).
 - Install CMake (and possibly "build-essential").
-- Run `CMAKE_PREFIX_PATH=/your/path/to/libtorch bash build.sh`.
 
-You are expected to see the unittests passed.
+### Install from Mooncakes
 
-## Usage
+```bash
+moon add liuly0322/tch_mbt
+CMAKE_PREFIX_PATH=/your/path/to/libtorch bash .mooncakes/liuly0322/tch_mbt/build.sh
+```
 
-Change code in `main/main.mbt` and run `bash run.sh`.
+Edit your `moon.pkg.json`:
+
+```json
+{
+  // ... other fields
+  "import": [
+    {
+      "path": "liuly0322/tch_mbt/torch",
+      "alias": "torch"
+    }
+  ],
+  "link": {
+    "native": {
+      "cc-link-flags": "-ltchproxy -Wl,-rpath,$HOME/.moon/lib"
+    }
+  }
+}
+```
+
+Then write some code:
+
+```moonbit
+fn main {
+  let tensor = @torch.tensor_from_array([1.0, 2.0, 3.0]).reshape([3, 1])
+  println(tensor.matmul(tensor.transpose()))
+}
+```
+
+Run: `moon run src/main --target native`
+
+### Develop on top of this repo
+
+```bash
+git clone https://github.com/moonbit-community/tch-mbt.git
+cd tch-mbt
+CMAKE_PREFIX_PATH=/your/path/to/libtorch bash build.sh
+```
+
+Now edit code in `main/main.mbt` if you want and run `bash run.sh`. Enjoy!
 
 > [!WARNING]
 > The `moon build` command will fail for [moon#674](https://github.com/moonbitlang/moon/issues/674), but it will successfully generate the executable, see `run.sh` for details.
@@ -44,20 +85,6 @@ fn main {
 ## API
 
 Check the full list in [torch.mbti](torch/torch.mbti).
-
-## How it works
-
-While libtorch offers a C++ API, FFI wrappers are needed on top of it. However writing C++ code over libtorch requires a build system like CMake. So we first build a shared library "tchproxy", then link it with MoonBit.
-
-```json
-{
-    "link": {
-        "native": {
-            "cc-link-flags": "-ltchproxy -Wl,-rpath,$HOME/.moon/lib"
-        }
-    }
-}
-```
 
 ## Roadmap & TODOs
 
