@@ -1,20 +1,18 @@
 # tch_mbt
 
-Using libtorch in MoonBit.
+A MoonBit wrapper for libtorch, enabling tensor operations and neural network inference via FFI.
 
 > [!NOTE]
 > Only Linux is supported.
 
 ## Installation
 
-You can either install from Mooncakes (as a library) or develop on top of this repo (as a starter template). 
-
-Either way requires:
+### Prerequisites
 
 - Install libtorch (<https://pytorch.org/cppdocs/installing.html>).
 - Install CMake (and possibly "build-essential").
 
-### Install from Mooncakes
+### Option 1: Use as a library via Mooncakes
 
 ```bash
 moon add liuly0322/tch_mbt
@@ -51,7 +49,7 @@ fn main {
 
 Run: `moon run src/main --target native`
 
-### Develop on top of this repo
+### Option 2: Develop from this repo
 
 ```bash
 git clone https://github.com/moonbit-community/tch-mbt.git
@@ -90,7 +88,7 @@ Check the full list in [torch.mbti](torch/torch.mbti).
 
 - [x] Basic tensor operations.
 - [x] Basic neural network forward pass.
-- [x] Build an real inference model demo.
+- [x] Build a real inference model demo.
 - [ ] Add more tensor operations.
 - [ ] Add more neural network operations.
 - [ ] Support static build (see [tch-rs](https://github.com/LaurentMazare/tch-rs) for building `libtorch.a`).
