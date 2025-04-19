@@ -43,7 +43,7 @@ jobs:
           git diff --exit-code
       
       - name: build and run unittests
-        run:  CMAKE_PREFIX_PATH=../libtorch bash build.sh
+        run:  CMAKE_PREFIX_PATH=${{ github.workspace }}/libtorch bash build.sh
 
   typo-check:
     runs-on: ubuntu-latest
