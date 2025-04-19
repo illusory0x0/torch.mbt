@@ -5,5 +5,5 @@ mkdir -p build
 cd build
 cmake -DCMAKE_PREFIX_PATH=../libtorch -DUSE_ASAN=ON ..
 make -j
-cp libtchproxy.so ../../
+cp libtchproxy.so $HOME/.moon/lib
 cd ../../

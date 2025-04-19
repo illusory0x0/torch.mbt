@@ -51,7 +51,7 @@ While libtorch offers a C++ API, FFI wrappers are needed on top of it. However w
 {
     "link": {
         "native": {
-            "cc-flags": "-L. -ltchproxy"
+            "cc-link-flags": "-L. -ltchproxy -Wl,-rpath,$HOME/.moon/lib"
         }
     }
 }
