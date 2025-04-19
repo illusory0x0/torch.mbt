@@ -1,8 +1,0 @@
-{
-    "link": {
-        "native": {
-            "cc-link-flags": "-fsanitize=address -L. -ltchproxy -Wl,-rpath,$HOME/.moon/lib"
-        }
-    },
-    "warn-list": "-5"
-}

@@ -42,14 +42,8 @@ jobs:
           moon info --target native
           git diff --exit-code
       
-      - name: build
-        run:  bash .github/workflows/build.sh
-
-      - name: Set ulimit and run bash test.sh
-        if: ${{ matrix.os != 'windows-latest' }}
-        run: |
-          ulimit -s 8176
-           bash .github/workflows/test.sh
+      - name: build and run unittests
+        run:  CMAKE_PREFIX_PATH=../libtorch bash build.sh
 
   typo-check:
     runs-on: ubuntu-latest
@@ -68,49 +62,6 @@ jobs:
 
       - name: check typos
         run: typos
-
-  nightly-check:
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-      fail-fast: false
-
-    continue-on-error: true
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: install
-        if: ${{ matrix.os != 'windows-latest' }}
-        run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s 'nightly'
-          echo "$HOME/.moon/bin" >> $GITHUB_PATH
-
-      - name: install libtorch
-        if: ${{ matrix.os != 'windows-latest' }}
-        run: |
-          wget https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip
-          unzip libtorch-shared-with-deps-latest.zip
-
-        env:
-          MOONBIT_INSTALL_VERSION: nightly
-
-      - name: moon version
-        run: |
-          moon version --all
-          moonrun --version
-
-      - name: moon check
-        run: moon check --target native 
-
-      - name: build
-        run:  bash .github/workflows/build.sh
-
-      - name: Set ulimit and run bash test.sh
-        if: ${{ matrix.os != 'windows-latest' }}
-        run: |
-          ulimit -s 8176
-           bash .github/workflows/test.sh
 
   moon-json-format-check:
     runs-on: ubuntu-latest

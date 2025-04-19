@@ -2,7 +2,7 @@ rm -rf target
 cd libtorch_proxy
 mkdir -p build
 cd build
-cmake -DCMAKE_PREFIX_PATH=/your/path/to/libtorch ..
+cmake ..
 make -j
 cp libtchproxy.so $HOME/.moon/lib
 cd ../../

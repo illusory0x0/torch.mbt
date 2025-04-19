@@ -12,8 +12,7 @@ Only Linux is supported.
 - Clone the repo.
 - Install libtorch (<https://pytorch.org/cppdocs/installing.html>).
 - Install CMake (and possibly "build-essential").
-- Edit `build.sh` to set the correct path of libtorch library.
-- Run `bash build.sh`.
+- Run `CMAKE_PREFIX_PATH=/your/path/to/libtorch bash build.sh`.
 
 You are expected to see the unittests passed.
 
